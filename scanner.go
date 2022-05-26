@@ -76,7 +76,7 @@ func (s *scanner) scanWs() token {
 
 func (s *scanner) scanNumber() token {
 	start := s.pos
-	for isDigit(s.ch) {
+	for isDigit(s.ch) || s.ch == '.' {
 		s.advance()
 	}
 	lit := s.input[start:s.pos]
