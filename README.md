@@ -21,6 +21,7 @@ string
 bool
 int int32
 uint uint32
+float64 float32
 ```
 - slices
 - maps
