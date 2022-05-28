@@ -4,6 +4,8 @@ This is the Flame language:
 
 (The language will certainly change. A specification must be written.)
 
+The current version doesn't support UTF-8, only ASCII.
+
 #### Variable declaration
 ```go
 string name = "Jennifer"
@@ -61,7 +63,7 @@ if true {
 
 if a == 5 {
     // ...
-} else if {} else {}
+} elseif {} else {}
 
 if true 5 else 6
 
@@ -153,10 +155,12 @@ codegen.compileCInstruction()
 ++
 &
 *
+!
 
 // infix
 + - * / 
 += -= *= /= 
+< > <= >=
 != == << >>
 && ||
 & | ^

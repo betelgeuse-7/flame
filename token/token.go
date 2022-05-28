@@ -7,9 +7,10 @@ const (
 	T_Illegal    TokenType = "ILLEGAL"
 	T_Whitespace TokenType = "WHITESPACE"
 
-	T_Ident  TokenType = "IDENT"
-	T_String TokenType = "STRING"
-	T_Number TokenType = "NUMBER"
+	T_Ident   TokenType = "IDENT"
+	T_String  TokenType = "STRING"
+	T_Number  TokenType = "NUMBER"
+	T_Comment TokenType = "COMMENT"
 
 	/* ****** KEYWORDS *********/
 	T_VoidKw    TokenType = "VOIDKW"
@@ -22,7 +23,6 @@ const (
 	T_Float32Kw TokenType = "FLOAT32KW"
 	T_BoolKw    TokenType = "BOOLKW"
 
-	T_Var      TokenType = "VAR"
 	T_Const    TokenType = "CONST"
 	T_Return   TokenType = "RETURN"
 	T_Match    TokenType = "MATCH"
@@ -35,6 +35,7 @@ const (
 	T_Repeat   TokenType = "REPEAT"
 	T_Forever  TokenType = "FOREVER"
 	T_Foreach  TokenType = "FOREACH"
+	T_In       TokenType = "IN"
 	T_While    TokenType = "WHILE"
 	T_Break    TokenType = "BREAK"
 	T_Continue TokenType = "CONTINUE"
@@ -74,6 +75,8 @@ const (
 	T_Dot           TokenType = "DOT"
 	T_Gt            TokenType = "GT"
 	T_Lt            TokenType = "LT"
+	T_GtEq          TokenType = "GTEQ" // >=
+	T_LtEq          TokenType = "LTEQ" // <=
 	T_Dollar        TokenType = "DOLLAR"
 	T_Ampersand     TokenType = "AMPERSAND"
 	T_Colon         TokenType = "COLON"

@@ -1,6 +1,8 @@
 package scanner
 
-import "flame/token"
+import (
+	"flame/token"
+)
 
 type Scanner struct {
 	input string
@@ -26,6 +28,19 @@ func (s *Scanner) advance() {
 	s.ch = s.input[s.pos]
 }
 
+func (s *Scanner) doubleAdvance() {
+	s.advance()
+	s.advance()
+}
+
+func (s *Scanner) peek() byte {
+	if s.pos+1 == len(s.input) {
+		// eof
+		return 0
+	}
+	return s.input[s.pos+1]
+}
+
 func (s *Scanner) Next() token.Token {
 	if s.ch == 0 {
 		return token.Token{Typ: token.T_Eof, Lit: "EOF"}
@@ -41,15 +56,43 @@ func (s *Scanner) Next() token.Token {
 	}
 	switch s.ch {
 	case '+':
+		if p := s.peek(); p == '+' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_PlusPlus, Lit: "++"}
+		} else if p == '=' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_PlusEq, Lit: "+="}
+		}
 		s.advance()
 		return token.Token{Typ: token.T_Plus, Lit: "+"}
 	case '-':
+		if p := s.peek(); p == '-' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_MinusMinus, Lit: "--"}
+		} else if p == '=' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_MinusEq, Lit: "-="}
+		} else if p == '>' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_SingleArrow, Lit: "->"}
+		}
 		s.advance()
 		return token.Token{Typ: token.T_Minus, Lit: "-"}
 	case '*':
+		if p := s.peek(); p == '=' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_MulEq, Lit: "*="}
+		}
 		s.advance()
 		return token.Token{Typ: token.T_Mul, Lit: "*"}
 	case '/':
+		if p := s.peek(); p == '=' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_DivEq, Lit: "/="}
+		} else if p == '/' {
+			s.advance()
+			return s.scanComment()
+		}
 		s.advance()
 		return token.Token{Typ: token.T_Div, Lit: "/"}
 	case '(':
@@ -59,8 +102,74 @@ func (s *Scanner) Next() token.Token {
 		s.advance()
 		return token.Token{Typ: token.T_Rparen, Lit: ")"}
 	case '=':
+		if p := s.peek(); p == '=' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_DoubleEq, Lit: "=="}
+		} else if p == '>' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_DoubleArrow, Lit: "=>"}
+		}
 		s.advance()
 		return token.Token{Typ: token.T_Eq, Lit: "="}
+	case '<':
+		if p := s.peek(); p == '<' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_BitLeftShift, Lit: "<<"}
+		} else if p == '=' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_LtEq, Lit: "<="}
+		}
+		s.advance()
+		return token.Token{Typ: token.T_Lt, Lit: "<"}
+	case '>':
+		if p := s.peek(); p == '>' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_BitRightShift, Lit: ">>"}
+		} else if p == '=' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_GtEq, Lit: ">="}
+		}
+		s.advance()
+		return token.Token{Typ: token.T_Gt, Lit: ">"}
+	case '&':
+		if p := s.peek(); p == '&' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_And, Lit: "&&"}
+		}
+		s.advance()
+		return token.Token{Typ: token.T_BitAnd, Lit: "&"}
+	case '|':
+		if p := s.peek(); p == '|' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_Or, Lit: "||"}
+		}
+		s.advance()
+		return token.Token{Typ: token.T_BitOr, Lit: "|"}
+	case '^':
+		s.advance()
+		return token.Token{Typ: token.T_BitXor, Lit: "^"}
+	case '!':
+		if p := s.peek(); p == '=' {
+			s.doubleAdvance()
+			return token.Token{Typ: token.T_NotEq, Lit: "!="}
+		}
+		s.advance()
+		return token.Token{Typ: token.T_Exclamation, Lit: "!"}
+	case '{':
+		s.advance()
+		return token.Token{Typ: token.T_LCurly, Lit: "{"}
+	case '}':
+		s.advance()
+		return token.Token{Typ: token.T_RCurly, Lit: "}"}
+	case ',':
+		s.advance()
+		return token.Token{Typ: token.T_Comma, Lit: ","}
+	case '$':
+		s.advance()
+		return token.Token{Typ: token.T_Dollar, Lit: "$"}
+	case '.':
+		s.advance()
+		return token.Token{Typ: token.T_Dot, Lit: "."}
 	default:
 		s.advance()
 		return token.Token{Typ: token.T_Illegal, Lit: string(s.ch)}
@@ -92,22 +201,8 @@ func (s *Scanner) scanIdentOrKw() token.Token {
 	}
 	lit := s.input[start:s.pos]
 	tok := token.Token{}
-	switch lit {
-	case "var":
-		tok = token.Token{Typ: token.T_Var}
-	case "const":
-		tok = token.Token{Typ: token.T_Const}
-	case "string":
-		tok = token.Token{Typ: token.T_StringKw}
-	case "uint":
-		tok = token.Token{Typ: token.T_UintKw}
-	case "int":
-		tok = token.Token{Typ: token.T_IntKw}
-	case "bool":
-		tok = token.Token{Typ: token.T_BoolKw}
-	case "println":
-		tok = token.Token{Typ: token.T_Println}
-	default:
+	tok, ok := keywordMap[lit]
+	if !ok {
 		tok = token.Token{Typ: token.T_Ident, Lit: lit}
 	}
 	if tok.Typ != token.T_Ident {
@@ -127,4 +222,13 @@ func (s *Scanner) scanString() token.Token {
 	// skip over the terminating quote
 	s.advance()
 	return token.Token{Typ: token.T_String, Lit: lit}
+}
+
+func (s *Scanner) scanComment() token.Token {
+	start := s.pos
+	for s.ch != '\n' && s.ch != '\r' {
+		s.advance()
+	}
+	lit := s.input[start:s.pos]
+	return token.Token{Typ: token.T_Comment, Lit: lit}
 }
