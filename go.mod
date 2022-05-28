@@ -1,3 +1,3 @@
-module flame___01
+module flame
 
 go 1.16

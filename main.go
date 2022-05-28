@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flame/scanner"
+	"flame/token"
 	"fmt"
 	"log"
 	"os"
@@ -20,10 +22,10 @@ func main() {
 		panic("error while reading " + fileName + ": " + err.Error() + "\n")
 	}
 	input := string(bx)
-	scanner := newScanner(input)
+	scanner := scanner.New(input)
 	for {
-		tok := scanner.next()
-		if tok.typ == t_Eof {
+		tok := scanner.Next()
+		if tok.Typ == token.T_Eof {
 			break
 		}
 		fmt.Println(tok)

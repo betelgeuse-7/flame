@@ -1,4 +1,4 @@
-package main
+package scanner
 
 func isWhitespace(ch byte) bool {
 	return ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t'
