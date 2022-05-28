@@ -52,6 +52,7 @@ var (
 	_struct       = token.Token{Typ: token.T_Struct, Lit: "STRUCT"}
 	_embeds       = token.Token{Typ: token.T_Embeds, Lit: "EMBEDS"}
 	_dot          = token.Token{Typ: token.T_Dot, Lit: "."}
+	_comment      = func(lit string) token.Token { return token.Token{Typ: token.T_Comment, Lit: lit} }
 )
 
 func TestScannerNext(t *testing.T) {
@@ -65,6 +66,7 @@ func TestScannerNext(t *testing.T) {
 	input += "if{}forever foreach _, item in "
 	input += "true, 10.5 match with -> =>"
 	input += "$ << != == >=- -- ++ & && | || ^ += *="
+	input += "// this is a comment\n"
 	input += "pub struct embeds ."
 
 	s := New(input)
@@ -87,7 +89,7 @@ func TestScannerNext(t *testing.T) {
 		_true, _comma, _number("10.5"), _match, _with, _single_arrow,
 		_double_arrow, _dollar, _lshift, _neq, _eqeq, _geq,
 		_minus, _minusminus, _plusplus, _bitand, _and, _bitor,
-		_or, _bitxor, _pluseq, _muleq, _pub, _struct, _embeds, _dot,
+		_or, _bitxor, _pluseq, _muleq, _comment(" this is a comment"), _pub, _struct, _embeds, _dot,
 	}
 
 	for i, v := range got {

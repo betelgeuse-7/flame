@@ -225,6 +225,8 @@ func (s *Scanner) scanString() token.Token {
 }
 
 func (s *Scanner) scanComment() token.Token {
+	// get rid of /
+	s.advance()
 	start := s.pos
 	for s.ch != '\n' && s.ch != '\r' {
 		s.advance()
