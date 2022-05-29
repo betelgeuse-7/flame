@@ -54,126 +54,145 @@ func (s *Scanner) Next() token.Token {
 	} else if s.ch == '"' {
 		return s.scanString()
 	}
-	switch s.ch {
-	case '+':
-		if p := s.peek(); p == '+' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_PlusPlus, Lit: "++"}
-		} else if p == '=' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_PlusEq, Lit: "+="}
-		}
+	ahead := s.peek()
+	curAndAhead := string(s.ch) + string(ahead)
+	if curAndAhead == "//" {
 		s.advance()
-		return token.Token{Typ: token.T_Plus, Lit: "+"}
-	case '-':
-		if p := s.peek(); p == '-' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_MinusMinus, Lit: "--"}
-		} else if p == '=' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_MinusEq, Lit: "-="}
-		} else if p == '>' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_SingleArrow, Lit: "->"}
-		}
-		s.advance()
-		return token.Token{Typ: token.T_Minus, Lit: "-"}
-	case '*':
-		if p := s.peek(); p == '=' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_MulEq, Lit: "*="}
-		}
-		s.advance()
-		return token.Token{Typ: token.T_Mul, Lit: "*"}
-	case '/':
-		if p := s.peek(); p == '=' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_DivEq, Lit: "/="}
-		} else if p == '/' {
-			s.advance()
-			return s.scanComment()
-		}
-		s.advance()
-		return token.Token{Typ: token.T_Div, Lit: "/"}
-	case '(':
-		s.advance()
-		return token.Token{Typ: token.T_Lparen, Lit: "("}
-	case ')':
-		s.advance()
-		return token.Token{Typ: token.T_Rparen, Lit: ")"}
-	case '=':
-		if p := s.peek(); p == '=' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_DoubleEq, Lit: "=="}
-		} else if p == '>' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_DoubleArrow, Lit: "=>"}
-		}
-		s.advance()
-		return token.Token{Typ: token.T_Eq, Lit: "="}
-	case '<':
-		if p := s.peek(); p == '<' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_BitLeftShift, Lit: "<<"}
-		} else if p == '=' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_LtEq, Lit: "<="}
-		}
-		s.advance()
-		return token.Token{Typ: token.T_Lt, Lit: "<"}
-	case '>':
-		if p := s.peek(); p == '>' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_BitRightShift, Lit: ">>"}
-		} else if p == '=' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_GtEq, Lit: ">="}
-		}
-		s.advance()
-		return token.Token{Typ: token.T_Gt, Lit: ">"}
-	case '&':
-		if p := s.peek(); p == '&' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_And, Lit: "&&"}
-		}
-		s.advance()
-		return token.Token{Typ: token.T_BitAnd, Lit: "&"}
-	case '|':
-		if p := s.peek(); p == '|' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_Or, Lit: "||"}
-		}
-		s.advance()
-		return token.Token{Typ: token.T_BitOr, Lit: "|"}
-	case '^':
-		s.advance()
-		return token.Token{Typ: token.T_BitXor, Lit: "^"}
-	case '!':
-		if p := s.peek(); p == '=' {
-			s.doubleAdvance()
-			return token.Token{Typ: token.T_NotEq, Lit: "!="}
-		}
-		s.advance()
-		return token.Token{Typ: token.T_Exclamation, Lit: "!"}
-	case '{':
-		s.advance()
-		return token.Token{Typ: token.T_LCurly, Lit: "{"}
-	case '}':
-		s.advance()
-		return token.Token{Typ: token.T_RCurly, Lit: "}"}
-	case ',':
-		s.advance()
-		return token.Token{Typ: token.T_Comma, Lit: ","}
-	case '$':
-		s.advance()
-		return token.Token{Typ: token.T_Dollar, Lit: "$"}
-	case '.':
-		s.advance()
-		return token.Token{Typ: token.T_Dot, Lit: "."}
-	default:
-		s.advance()
-		return token.Token{Typ: token.T_Illegal, Lit: string(s.ch)}
+		return s.scanComment()
 	}
+	doubleCharTok, ok := doubleCharMap[curAndAhead]
+	if ok {
+		s.doubleAdvance()
+		return doubleCharTok
+	}
+	singleCharTok, ok := singleCharMap[s.ch]
+	if ok {
+		s.advance()
+		return singleCharTok
+	}
+	return token.Token{Typ: token.T_Illegal, Lit: string(s.ch)}
+	/*
+		switch s.ch {
+		case '+':
+			if p := s.peek(); p == '+' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_PlusPlus, Lit: "++"}
+			} else if p == '=' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_PlusEq, Lit: "+="}
+			}
+			s.advance()
+			return token.Token{Typ: token.T_Plus, Lit: "+"}
+		case '-':
+			if p := s.peek(); p == '-' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_MinusMinus, Lit: "--"}
+			} else if p == '=' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_MinusEq, Lit: "-="}
+			} else if p == '>' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_SingleArrow, Lit: "->"}
+			}
+			s.advance()
+			return token.Token{Typ: token.T_Minus, Lit: "-"}
+		case '*':
+			if p := s.peek(); p == '=' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_MulEq, Lit: "*="}
+			}
+			s.advance()
+			return token.Token{Typ: token.T_Mul, Lit: "*"}
+		case '/':
+			if p := s.peek(); p == '=' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_DivEq, Lit: "/="}
+			} else if p == '/' {
+				s.advance()
+				return s.scanComment()
+			}
+			s.advance()
+			return token.Token{Typ: token.T_Div, Lit: "/"}
+		case '(':
+			s.advance()
+			return token.Token{Typ: token.T_Lparen, Lit: "("}
+		case ')':
+			s.advance()
+			return token.Token{Typ: token.T_Rparen, Lit: ")"}
+		case '=':
+			if p := s.peek(); p == '=' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_DoubleEq, Lit: "=="}
+			} else if p == '>' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_DoubleArrow, Lit: "=>"}
+			}
+			s.advance()
+			return token.Token{Typ: token.T_Eq, Lit: "="}
+		case '<':
+			if p := s.peek(); p == '<' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_BitLeftShift, Lit: "<<"}
+			} else if p == '=' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_LtEq, Lit: "<="}
+			}
+			s.advance()
+			return token.Token{Typ: token.T_Lt, Lit: "<"}
+		case '>':
+			if p := s.peek(); p == '>' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_BitRightShift, Lit: ">>"}
+			} else if p == '=' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_GtEq, Lit: ">="}
+			}
+			s.advance()
+			return token.Token{Typ: token.T_Gt, Lit: ">"}
+		case '&':
+			if p := s.peek(); p == '&' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_And, Lit: "&&"}
+			}
+			s.advance()
+			return token.Token{Typ: token.T_BitAnd, Lit: "&"}
+		case '|':
+			if p := s.peek(); p == '|' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_Or, Lit: "||"}
+			}
+			s.advance()
+			return token.Token{Typ: token.T_BitOr, Lit: "|"}
+		case '^':
+			s.advance()
+			return token.Token{Typ: token.T_BitXor, Lit: "^"}
+		case '!':
+			if p := s.peek(); p == '=' {
+				s.doubleAdvance()
+				return token.Token{Typ: token.T_NotEq, Lit: "!="}
+			}
+			s.advance()
+			return token.Token{Typ: token.T_Exclamation, Lit: "!"}
+		case '{':
+			s.advance()
+			return token.Token{Typ: token.T_LCurly, Lit: "{"}
+		case '}':
+			s.advance()
+			return token.Token{Typ: token.T_RCurly, Lit: "}"}
+		case ',':
+			s.advance()
+			return token.Token{Typ: token.T_Comma, Lit: ","}
+		case '$':
+			s.advance()
+			return token.Token{Typ: token.T_Dollar, Lit: "$"}
+		case '.':
+			s.advance()
+			return token.Token{Typ: token.T_Dot, Lit: "."}
+		default:
+			s.advance()
+			return token.Token{Typ: token.T_Illegal, Lit: string(s.ch)}
+		}
+	*/
 }
 
 func (s *Scanner) scanWs() token.Token {

@@ -91,7 +91,6 @@ func TestScannerNext(t *testing.T) {
 		_minus, _minusminus, _plusplus, _bitand, _and, _bitor,
 		_or, _bitxor, _pluseq, _muleq, _comment(" this is a comment"), _pub, _struct, _embeds, _dot,
 	}
-
 	for i, v := range got {
 		if i == len(want) {
 			t.Errorf("out of bounds %d\n", i)
