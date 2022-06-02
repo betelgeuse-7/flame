@@ -67,7 +67,7 @@ const (
 	T_DoubleEq      TokenType = "DOUBLEEQ"
 	T_BitLeftShift  TokenType = "BITLEFTSHIFT"  // <<
 	T_BitRightShift TokenType = "BITRIGHTSHIFT" // >>
-	T_BitAnd        TokenType = "BITAND"        // &
+	T_Ampersand     TokenType = "AMPERSAND"     // &
 	T_BitOr         TokenType = "BITOR"         // |
 	T_BitXor        TokenType = "BITXOR"        // ^
 	T_And           TokenType = "AND"
@@ -78,7 +78,6 @@ const (
 	T_GtEq          TokenType = "GTEQ" // >=
 	T_LtEq          TokenType = "LTEQ" // <=
 	T_Dollar        TokenType = "DOLLAR"
-	T_Ampersand     TokenType = "AMPERSAND"
 	T_Colon         TokenType = "COLON"
 	T_Comma         TokenType = "COMMA"
 	T_Exclamation   TokenType = "EXCLAMATION"

@@ -41,7 +41,7 @@ var (
 	_geq          = token.Token{Typ: token.T_GtEq, Lit: ">="}
 	_minusminus   = token.Token{Typ: token.T_MinusMinus, Lit: "--"}
 	_plusplus     = token.Token{Typ: token.T_PlusPlus, Lit: "++"}
-	_bitand       = token.Token{Typ: token.T_BitAnd, Lit: "&"}
+	_ampersand    = token.Token{Typ: token.T_Ampersand, Lit: "&"}
 	_bitor        = token.Token{Typ: token.T_BitOr, Lit: "|"}
 	_and          = token.Token{Typ: token.T_And, Lit: "&&"}
 	_or           = token.Token{Typ: token.T_Or, Lit: "||"}
@@ -88,7 +88,7 @@ func TestScannerNext(t *testing.T) {
 		_forever, _foreach, _ident("_"), _comma, _ident("item"), _in,
 		_true, _comma, _number("10.5"), _match, _with, _single_arrow,
 		_double_arrow, _dollar, _lshift, _neq, _eqeq, _geq,
-		_minus, _minusminus, _plusplus, _bitand, _and, _bitor,
+		_minus, _minusminus, _plusplus, _ampersand, _and, _bitor,
 		_or, _bitxor, _pluseq, _muleq, _comment(" this is a comment"), _pub, _struct, _embeds, _dot,
 	}
 	for i, v := range got {

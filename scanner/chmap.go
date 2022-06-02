@@ -8,7 +8,7 @@ var singleCharMap = map[byte]token.Token{
 	'/': {Typ: token.T_Div, Lit: "/"},
 	'*': {Typ: token.T_Mul, Lit: "*"},
 	'!': {Typ: token.T_Exclamation, Lit: "!"},
-	'&': {Typ: token.T_BitAnd, Lit: "&"},
+	'&': {Typ: token.T_Ampersand, Lit: "&"},
 	'|': {Typ: token.T_BitOr, Lit: "|"},
 	'<': {Typ: token.T_Lt, Lit: "<"},
 	'>': {Typ: token.T_Gt, Lit: ">"},
