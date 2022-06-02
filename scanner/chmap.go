@@ -2,10 +2,6 @@ package scanner
 
 import "flame/token"
 
-/*
-var doubleCharSymbols = []string{"++", "+=", "--", "-=", "*=", "/=", "<=", ">=", "!=",
-	"==", "<<", ">>", "&&", "||"}
-*/
 var singleCharMap = map[byte]token.Token{
 	'+': {Typ: token.T_Plus, Lit: "+"},
 	'-': {Typ: token.T_Minus, Lit: "-"},
@@ -20,6 +16,11 @@ var singleCharMap = map[byte]token.Token{
 	'^': {Typ: token.T_BitXor, Lit: "^"},
 	'(': {Typ: token.T_Lparen, Lit: "("},
 	')': {Typ: token.T_Rparen, Lit: ")"},
+	'{': {Typ: token.T_LCurly, Lit: "{"},
+	'}': {Typ: token.T_RCurly, Lit: "}"},
+	',': {Typ: token.T_Comma, Lit: ","},
+	'.': {Typ: token.T_Dot, Lit: "."},
+	'$': {Typ: token.T_Dollar, Lit: "$"},
 }
 
 var doubleCharMap = map[string]token.Token{
@@ -37,4 +38,6 @@ var doubleCharMap = map[string]token.Token{
 	">>": {Typ: token.T_BitRightShift, Lit: ">>"},
 	"&&": {Typ: token.T_And, Lit: "&&"},
 	"||": {Typ: token.T_Or, Lit: "||"},
+	"->": {Typ: token.T_SingleArrow, Lit: "->"},
+	"=>": {Typ: token.T_DoubleArrow, Lit: "=>"},
 }
