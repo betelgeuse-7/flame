@@ -70,6 +70,11 @@ func TestScannerNext(t *testing.T) {
 	input += "pub struct embeds ."
 
 	s := New(input)
+	// we expect s.y to be 1 in the beginning
+	expectSDotY := 1
+	if s.y != expectSDotY {
+		t.Errorf("expected s.y to be %d, but got %d\n", expectSDotY, s.y)
+	}
 	got := []token.Token{}
 	for {
 		tok := s.Next()
@@ -102,6 +107,11 @@ func TestScannerNext(t *testing.T) {
 		if v.Lit != curWant.Lit || v.Typ != curWant.Typ {
 			t.Errorf("at index %d, wanted %v, but got %v\n", i, curWant, v)
 		}
+	}
+	// we expect s.y to be 5 in the end
+	expectSDotY = 5
+	if s.y != expectSDotY {
+		t.Errorf("expected s.y to be %d, but got %d\n", expectSDotY, s.y)
 	}
 }
 

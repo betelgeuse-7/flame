@@ -7,19 +7,24 @@ import (
 type Scanner struct {
 	input string
 	ch    byte
-	pos   int
+	pos   int // col
+	y     int // row
 }
 
 func New(input string) *Scanner {
 	s := &Scanner{
 		input: input,
 		pos:   0,
+		y:     1,
 	}
 	s.ch = s.input[s.pos]
 	return s
 }
 
 func (s *Scanner) advance() {
+	if p := s.peek(); p == '\n' {
+		s.y++
+	}
 	s.pos++
 	if s.pos == len(s.input) {
 		s.ch = 0
@@ -46,7 +51,9 @@ func (s *Scanner) Next() token.Token {
 		return token.Token{Typ: token.T_Eof, Lit: "EOF"}
 	}
 	if isWhitespace(s.ch) {
-		return s.scanWs()
+		s.eatWs()
+		return s.Next()
+		//return s.scanWs()
 	} else if isDigit(s.ch) {
 		return s.scanNumber()
 	} else if isAsciiLetter(s.ch) {
@@ -130,4 +137,10 @@ func (s *Scanner) scanComment() token.Token {
 	}
 	lit := s.input[start:s.pos]
 	return token.Token{Typ: token.T_Comment, Lit: lit}
+}
+
+func (s *Scanner) eatWs() {
+	for isWhitespace(s.ch) {
+		s.advance()
+	}
 }

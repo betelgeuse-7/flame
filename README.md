@@ -7,7 +7,7 @@ This is the Flame language:
 The current version doesn't support UTF-8, only ASCII.
 
 #### Variable declaration
-```go
+```
 string name = "Jennifer"
 uint age = 44
 ```

@@ -1,6 +1,2 @@
-const PI uint = 3.14
-var state string = "loading"
-
-state = "loaded"
-
-println(3 + 4 * 8 / 654 + (-156 * 3))
+string name = "Jennifer"
+uint age = 32

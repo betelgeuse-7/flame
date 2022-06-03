@@ -2,6 +2,10 @@ package token
 
 type TokenType string
 
+type DataType interface {
+	X()
+}
+
 const (
 	T_Eof        TokenType = "EOF"
 	T_Illegal    TokenType = "ILLEGAL"
@@ -13,15 +17,15 @@ const (
 	T_Comment TokenType = "COMMENT"
 
 	/* ****** KEYWORDS *********/
-	T_VoidKw    TokenType = "VOIDKW"
-	T_StringKw  TokenType = "STRINGKW"
-	T_UintKw    TokenType = "UINTKW"
-	T_Uint32Kw  TokenType = "UINT32KW"
-	T_IntKw     TokenType = "INTKW"
-	T_Int32Kw   TokenType = "INT32KW"
-	T_Float64Kw TokenType = "FLOAT64KW"
-	T_Float32Kw TokenType = "FLOAT32KW"
-	T_BoolKw    TokenType = "BOOLKW"
+	T_VoidKw    TokenType = "void"
+	T_StringKw  TokenType = "string"
+	T_UintKw    TokenType = "uint"
+	T_Uint32Kw  TokenType = "uint32"
+	T_IntKw     TokenType = "int"
+	T_Int32Kw   TokenType = "int32"
+	T_Float64Kw TokenType = "float64"
+	T_Float32Kw TokenType = "float32"
+	T_BoolKw    TokenType = "bool"
 
 	T_Const    TokenType = "CONST"
 	T_Return   TokenType = "RETURN"
