@@ -4,16 +4,18 @@ import (
 	"flame/token"
 )
 
+const _EOF_RUNE = rune(0)
+
 type Scanner struct {
-	input string
-	ch    byte
+	input []rune
+	ch    rune
 	pos   int // col
 	y     int // row
 }
 
 func New(input string) *Scanner {
 	s := &Scanner{
-		input: input,
+		input: []rune(input),
 		pos:   0,
 		y:     1,
 	}
@@ -27,7 +29,7 @@ func (s *Scanner) advance() {
 	}
 	s.pos++
 	if s.pos == len(s.input) {
-		s.ch = 0
+		s.ch = _EOF_RUNE
 		return
 	}
 	s.ch = s.input[s.pos]
@@ -38,22 +40,20 @@ func (s *Scanner) doubleAdvance() {
 	s.advance()
 }
 
-func (s *Scanner) peek() byte {
+func (s *Scanner) peek() rune {
 	if s.pos+1 == len(s.input) {
-		// eof
-		return 0
+		return _EOF_RUNE
 	}
 	return s.input[s.pos+1]
 }
 
 func (s *Scanner) Next() token.Token {
-	if s.ch == 0 {
+	if s.ch == _EOF_RUNE {
 		return token.Token{Typ: token.T_Eof, Lit: "EOF"}
 	}
 	if isWhitespace(s.ch) {
 		s.eatWs()
 		return s.Next()
-		//return s.scanWs()
 	} else if isDigit(s.ch) {
 		return s.scanNumber()
 	} else if isAsciiLetter(s.ch) {
@@ -72,21 +72,14 @@ func (s *Scanner) Next() token.Token {
 		s.doubleAdvance()
 		return doubleCharTok
 	}
-	singleCharTok, ok := singleCharMap[s.ch]
+	singleCharTok, ok := singleCharMap[byte(s.ch)]
 	if ok {
 		s.advance()
 		return singleCharTok
 	}
-	return token.Token{Typ: token.T_Illegal, Lit: string(s.ch)}
-}
-
-func (s *Scanner) scanWs() token.Token {
-	start := s.pos
-	for isWhitespace(s.ch) {
-		s.advance()
-	}
-	lit := s.input[start:s.pos]
-	return token.Token{Typ: token.T_Whitespace, Lit: lit}
+	illegalCh := s.ch
+	s.advance()
+	return token.Token{Typ: token.T_Illegal, Lit: string(illegalCh)}
 }
 
 func (s *Scanner) scanNumber() token.Token {
@@ -94,7 +87,7 @@ func (s *Scanner) scanNumber() token.Token {
 	for isDigit(s.ch) || s.ch == '.' {
 		s.advance()
 	}
-	lit := s.input[start:s.pos]
+	lit := string(s.input[start:s.pos])
 	return token.Token{Typ: token.T_Number, Lit: lit}
 }
 
@@ -103,7 +96,7 @@ func (s *Scanner) scanIdentOrKw() token.Token {
 	for isAsciiLetter(s.ch) {
 		s.advance()
 	}
-	lit := s.input[start:s.pos]
+	lit := string(s.input[start:s.pos])
 	tok := token.Token{}
 	tok, ok := keywordMap[lit]
 	if !ok {
@@ -122,7 +115,7 @@ func (s *Scanner) scanString() token.Token {
 	for s.ch != '"' && s.ch != 0 {
 		s.advance()
 	}
-	lit := s.input[start:s.pos]
+	lit := string(s.input[start:s.pos])
 	// skip over the terminating quote
 	s.advance()
 	return token.Token{Typ: token.T_String, Lit: lit}
@@ -135,7 +128,7 @@ func (s *Scanner) scanComment() token.Token {
 	for s.ch != '\n' && s.ch != '\r' {
 		s.advance()
 	}
-	lit := s.input[start:s.pos]
+	lit := string(s.input[start:s.pos])
 	return token.Token{Typ: token.T_Comment, Lit: lit}
 }
 

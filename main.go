@@ -25,14 +25,6 @@ func main() {
 	}
 	input := string(bx)
 	scanner := scanner.New(input)
-	/*
-		for {
-			tok := scanner.Next()
-			if tok.Typ == token.T_Eof {
-				break
-			}
-			fmt.Println(tok)
-		}*/
 	p := parser.New(scanner)
 	program := p.ParseProgram()
 	goCode := "package main\n\n"
@@ -40,7 +32,7 @@ func main() {
 	goCode += gogen.CompileVarDecl(program.Stmts[0].(*ast.VariableDeclarationStmt))
 	goCode += gogen.CompileVarDecl(program.Stmts[1].(*ast.VariableDeclarationStmt))
 	goCode += "}"
-	os.WriteFile(fileName+"_compiled.go", []byte(goCode), 0777)
+	//os.WriteFile(fileName+"_compiled.go", []byte(goCode), 0777)
 	fmt.Println(goCode)
 	log.Println("Compiled Flame to Go :)")
 }

@@ -6,13 +6,12 @@ import (
 )
 
 var (
-	//_ws           = func(Lit string) token.Token { return token.Token{Typ: token.T_Whitespace, Lit: Lit} }
 	_ident        = func(Lit string) token.Token { return token.Token{Typ: token.T_Ident, Lit: Lit} }
-	_stringkw     = token.Token{Typ: token.T_StringKw, Lit: "STRINGKW"}
+	_stringkw     = token.Token{Typ: token.T_StringKw, Lit: "string"}
 	_eq           = token.Token{Typ: token.T_Eq, Lit: "="}
 	_string       = func(Lit string) token.Token { return token.Token{Typ: token.T_String, Lit: Lit} }
 	_const        = token.Token{Typ: token.T_Const, Lit: "CONST"}
-	_uintKw       = token.Token{Typ: token.T_UintKw, Lit: "UINTKW"}
+	_uintKw       = token.Token{Typ: token.T_UintKw, Lit: "uint"}
 	_number       = func(Lit string) token.Token { return token.Token{Typ: token.T_Number, Lit: Lit} }
 	_println      = token.Token{Typ: token.T_PrintlnFn, Lit: "PRINTLNFN"}
 	_lparen       = token.Token{Typ: token.T_Lparen, Lit: "("}
@@ -53,6 +52,7 @@ var (
 	_embeds       = token.Token{Typ: token.T_Embeds, Lit: "EMBEDS"}
 	_dot          = token.Token{Typ: token.T_Dot, Lit: "."}
 	_comment      = func(lit string) token.Token { return token.Token{Typ: token.T_Comment, Lit: lit} }
+	_illegal      = func(lit string) token.Token { return token.Token{Typ: token.T_Illegal, Lit: lit} }
 )
 
 func TestScannerNext(t *testing.T) {
@@ -68,6 +68,7 @@ func TestScannerNext(t *testing.T) {
 	input += "$ << != == >=- -- ++ & && | || ^ += *="
 	input += "// this is a comment\n"
 	input += "pub struct embeds ."
+	input += "\"🙂\" const string 🩸 = \"blood\""
 
 	s := New(input)
 	// we expect s.y to be 1 in the beginning
@@ -81,9 +82,7 @@ func TestScannerNext(t *testing.T) {
 		if tok.Typ == token.T_Eof {
 			break
 		}
-		if tok.Typ != token.T_Whitespace {
-			got = append(got, tok)
-		}
+		got = append(got, tok)
 	}
 	want := []token.Token{
 		_stringkw, _ident("name"), _eq, _string("Jennifer"), _const, _ident("age"), _uintKw, _eq,
@@ -95,15 +94,13 @@ func TestScannerNext(t *testing.T) {
 		_double_arrow, _dollar, _lshift, _neq, _eqeq, _geq,
 		_minus, _minusminus, _plusplus, _ampersand, _and, _bitor,
 		_or, _bitxor, _pluseq, _muleq, _comment(" this is a comment"), _pub, _struct, _embeds, _dot,
+		_string("🙂"), _const, _stringkw, _illegal("🩸"), _eq, _string("blood"),
 	}
 	for i, v := range got {
 		if i == len(want) {
 			t.Errorf("out of bounds %d\n", i)
 		}
 		curWant := want[i]
-		if curWant.Typ == token.T_Whitespace {
-			continue
-		}
 		if v.Lit != curWant.Lit || v.Typ != curWant.Typ {
 			t.Errorf("at index %d, wanted %v, but got %v\n", i, curWant, v)
 		}
@@ -114,14 +111,3 @@ func TestScannerNext(t *testing.T) {
 		t.Errorf("expected s.y to be %d, but got %d\n", expectSDotY, s.y)
 	}
 }
-
-/* 		_stringkw, _ws(" "), _ident("name"), _ws(" "), _ws(" "), _eq, _ws(" "), _string("Jennifer"),
-_ws("\n"), _const, _ws(" "), _ident("age"), _ws(" "), _uintKw, _ws(" "), _eq, _ws(" "), _number("44"),
-_ws("\n"), _println, _lparen, _string("hello"), _rparen, _ws("\n"), _number("61"), _ws(" "), _plus,
-_ws(" "), _number("75"), _ws(" "), _lparen, _number("12"), _ws(" "), _mul, _number("3"), _rparen, _ws(" "),
-_div, _ws("  "), _number("86"), _ws(" "), _minus, _ws(" "), _number("144"), _ws("\n"), _if, _lcurly, _rcurly,
-_forever, _ws(" "), _foreach, _ws(" "), _ident("_"), _comma, _ws(" "), _ident("item"), _ws(" "), _in, _ws("\n"),
-_true, _comma, _ws(" "), _number("10.5"), _ws(" "), _match, _ws(" "), _with, _ws(" "), _single_arrow, _ws(" "),
-_double_arrow, _ws("\n"), _dollar, _ws(" "), _lshift, _ws(" "), _neq, _ws(" "), _eqeq, _ws(" "), _geq, _ws(" "),
-_minus, _ws(" "), _minusminus, _ws(" "), _plusplus, _ws(" "), _bitand, _ws(" "), _and, _ws(" "), _bitor, _ws(" "),
-_or, _ws(" "), _bitxor, _ws(" "), _pluseq, _ws(" "), _muleq,*/

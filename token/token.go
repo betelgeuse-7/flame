@@ -7,9 +7,9 @@ type DataType interface {
 }
 
 const (
-	T_Eof        TokenType = "EOF"
-	T_Illegal    TokenType = "ILLEGAL"
-	T_Whitespace TokenType = "WHITESPACE"
+	T_Eof     TokenType = "EOF"
+	T_Illegal TokenType = "ILLEGAL"
+	//T_Whitespace TokenType = "WHITESPACE"
 
 	T_Ident   TokenType = "IDENT"
 	T_String  TokenType = "STRING"

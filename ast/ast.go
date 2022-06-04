@@ -6,13 +6,7 @@ import (
 
 /// TODO Position information for each node.
 
-type Node interface {
-	String() string
-	/*
-		Pos() uint
-		End() uint
-	*/
-}
+type Node interface{}
 
 type Stmt interface {
 	Node
@@ -30,14 +24,6 @@ type Program struct {
 
 type VariableDeclarationStmt struct {
 	DataType token.Token // data type kw token
-	//	Name     *Identifier
-	Name string // variable name
-	//Value Expr
-	Value string
+	Name     string      // variable name
+	Value    string
 }
-
-/*
-type Identifier struct {
-	Name string
-}
-*/

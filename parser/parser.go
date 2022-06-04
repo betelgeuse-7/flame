@@ -27,16 +27,9 @@ func (p *Parser) Errors() []string {
 	return p.errors
 }
 
-// ! ignore token.T_Whitespace
-// ? should we just ignore whitespaces in lexical analysis? (in scanner)
-
 func (p *Parser) advance() {
 	p.cur = p.peek
 	p.peek = p.scanner.Next()
-	for p.cur.Typ == token.T_Whitespace {
-		p.cur = p.peek
-		p.peek = p.scanner.Next()
-	}
 }
 
 func (p *Parser) expectPeek(t token.TokenType) bool {

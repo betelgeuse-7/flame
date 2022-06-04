@@ -6,7 +6,7 @@ import (
 )
 
 /********* *ast.Program ************************/
-
+/*
 func (p *Program) String() string {
 	var out bytes.Buffer
 	for _, s := range p.Stmts {
@@ -14,7 +14,7 @@ func (p *Program) String() string {
 	}
 	return out.String()
 }
-
+*/
 /*************************************************/
 
 /********** *ast.VariableDeclarationStmt **********/
