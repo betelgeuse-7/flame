@@ -133,20 +133,20 @@ void->void helloWorld => {
 }
 
 string x, bool y->[u32 z] X => {
-    42
+    [42, 24, 66, 12, 3]
 }
-// alternative: omit curly braces and put 42 right after =>
-// string x, bool y->[u32 z] X => 42
+// alternative: omit curly braces and put the return value right after '=>'
+// string x, bool y->[u32 z] X => [42, 24, 66, 12, 3]
 // you can also add return if you want
 // string x, bool y->[u32 z] X => {
-//    return 42
+//    return [42, 24, 66, 12, 3]
 //}
 ```
 ##### Calling functions
 ```rust
 helloWorld()
-#uint32 fortyTwo = X("yay", true)
-println(fortyTwo) // 42
+#uint32 z = X("yay", true)
+println(z) //[42, 24, 66, 12, 3]
 ```
 
 #### Control flow
