@@ -2,9 +2,74 @@
 
 This is the Flame language:
 
-(The language will certainly change. A specification must be written.)
+#### Encoding
+The Flame compiler supports UTF-8 encoded files, but you can only use ASCII when declaring variables.
+The supported line termination sequence is ASCII LF (\n). (CRLF (\r\n) is not seen as a newline, only \n).
 
-The current version doesn't support UTF-8, only ASCII.
+#### Indentation, and whitespace
+The Flame language is whitespace-insensitive, meaning whitespace is not important. 
+
+#### Comments
+Comments start with ```//```. Multi-line comments are not supported yet.
+
+#### Identifiers
+Identifiers are one or more characters of ASCII letters, or ```_```. ({A..Z, a..z, _})
+Identifiers are case-sensitive (e.g ```firstname```, and ```firstName``` is not the same variable.).
+Keywords cannot be used as identifiers.
+
+#### Keywords 
+TODO
+
+#### String literals
+String literals are enclosed in ```"``` (double quote) pairs. You can interpolate strings using ```${}``` notation. (e.g Assume world variable stores "WORLD" value. "Hello ${world}" == "Hello WORLD")
+
+Escape sequences are not yet supported. (TODO)
+
+#### Numeric literals
+There are three types of numerals: 
+    - Signed integers (```int```, ```int32```),
+    - Unsigned integers (```uint```, ```uint32```), and
+    - Floating point numbers (```float64```, ```float32```)
+
+Octal (```0o```), hexadecimal (```0x```), and binary notations (```0b```) are not yet supported.
+
+#### Operators
+There are three types of operators:
+    - Prefix,
+    - Infix, and
+    - Postfix
+```
+// prefix
+-               // negation operator
+--              // decrement-by-one
+++              // increment-by-one
+&               // address-of operator
+*               // dereferencing operator
+!               // not operator
+
+// infix
++ - * /         // you know what these mean
++= -= *= /=     // these also
+< > <= >=       // ...
+!=              // not equal
+==              // comparison
+<<              // left shift operator (bitwise)
+>>              // right shift operator 
+&&              // logical and
+||              // logical or
+&               // bitwise and
+|               // bitwise or 
+^               // bitwise xor
+'               // indexing operator
+
+// postfix
+--              // decrement-by-one
+++              // increment-by-one
+```
+
+### Context-Free Grammar (Extended Backus-Naur Form)
+
+TODO
 
 #### Variable declaration
 ```
@@ -13,46 +78,77 @@ uint age = 44
 ```
 #### Constant declaration
 ```go
-const string name = "Jennifer"
-const uint age = 44
+#string name = "Jennifer"
+#uint age = 44
 ```
 #### Types
-```go
+```rust
 void
 string
 bool
-int int32
-uint uint32
-float64 float32
+int i32
+uint u32
+f64 f32
 ```
-- slices
-- maps
+- Slices
+```rust
+#[string] fruits = ["Kiwi", "Orange", "Apple", "Banana"]
+fruits'0 // indexing
+fruits'-1 // last element
+
+#string popped = fruits.pop() 
+popped // Banana
+fruits.push("Strawberry")
+```
+- Maps
+```rust
+#{string:u32} people = {"Jennifer": 44}
+people."Mehmet" = 77
+u32 jenniferAge = people'"Jennifer" 
+jenniferAge // 44
+people.delete("Mehmet")
+```
 - structs
-- pointers
-
-### Functions
-```go
-const void helloWorld = () => {
-    println("hello world")
+```rust
+pub struct A {
+    pub string x
+    pub struct B {
+        u32 y
+    }
 }
-const string greetMe = (string name) => "hello ${name}"
 
-println(greetMe("betelgeuse-7")) // hello betelgeuse-7
+#A a = A.new(x: "Hello", B: B.new(y: 45))
+a.x // "Hello"
 
-// a function that returns a function that takes in a string and returns an int, and a bool.
-const ((string->int), bool) x = () => {
-    return int (string a) => {
-        match a {
-            with "A":
-                return 5
-            with "B":
-                return 18
-            else:
-                return -1
-        }
-    }, true
-}
+#[A] AX = [a, a, a]
+AX'1 // a
 ```
+- Pointers
+TODO
+
+#### Functions
+```rust
+void->void helloWorld => {
+    println("hello")
+}
+
+string x, bool y->[u32 z] X => {
+    42
+}
+// alternative: omit curly braces and put 42 right after =>
+// string x, bool y->[u32 z] X => 42
+// you can also add return if you want
+// string x, bool y->[u32 z] X => {
+//    return 42
+//}
+```
+##### Calling functions
+```rust
+helloWorld()
+#uint32 fortyTwo = X("yay", true)
+println(fortyTwo) // 42
+```
+
 #### Control flow
 ```go
 if true {
@@ -94,78 +190,8 @@ match {
         // ...
 }
 ```
-#### Compound data types
-```go
-// BUILT-IN
-// slice
-const [string] fruits = ["Kiwi", "Orange", "Apple", "Banana"]
-const {string:uint32} people = {"Jennifer": 44, "SomeGuy": 26}
 
-fruits[0] // Kiwi
-fruits[-1] // "Banana"
-fruits[1:3] // ["Orange", "Apple"]
-people["Jennifer"] // 44
-set(people, "AnotherGuy", 32)
-append(fruits, "Peach")
-delete(people, "Jennifer")
-string popped = pop(fruits)
-println(popped) // "Peach"
+#### Methods
 
-// STRUCTS
-struct Person embeds [Human] {
-    string name, city
-    uint age
+TODO
 
-    void speak = () => println("Hello I am ${self.name}, I live in ${self.city}, and I am ${self.age} years old.")
-    void wasBornIn2 = () => println(self.birthYear) // or self.Human.birthYear
-}   
-
-// structs implicitly get a 'new' method, which is basically a constructor.
-const Person p1 = Person.new(name: "Hasan", city: "Ankara", age: 55, birthYear: 1967)
-p1.speak() // Hello I am Hasan, ...
-p1.wasBornIn() // I was born in 1967
-
-struct Human {
-    uint birthYear
-
-    void wasBornIn = () => println("I was born in ${self.birthYear}")
-}
-
-// access modifiers
-// every global variable or struct or struct field/method, is private by default.
-// to make them public, add pub prefix.
-pub struct A {
-    pub string x
-} 
-
-// package system has the same semantics as Go.
-// declaration: 
-pkg codegen
-
-//
-import codegen
-
-codegen.compileCInstruction()
-```
-#### Operators
-```go
-// prefix
--
---
-++
-&
-*
-!
-
-// infix
-+ - * / 
-+= -= *= /= 
-< > <= >=
-!= == << >>
-&& ||
-& | ^
-// postfix
---
-++
-```
-So on ...
