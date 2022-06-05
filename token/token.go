@@ -92,10 +92,10 @@ const (
 
 	/* ****** Built-ins *********/
 	T_PrintlnFn TokenType = "PRINTLNFN"
-	T_SetFn     TokenType = "SETFN"
 	T_AppendFn  TokenType = "APPENDFN"
 	T_DeleteFn  TokenType = "DELETEFN"
 	T_PopFn     TokenType = "POPFN"
+	T_StrLenFn  TokenType = "STRLENFN"
 )
 
 type Token struct {

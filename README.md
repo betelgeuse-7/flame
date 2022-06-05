@@ -90,7 +90,7 @@ string
 bool
 int i32
 uint u32
-f64 f32
+float f32
 ```
 - Slices
 ```rust
@@ -98,9 +98,9 @@ f64 f32
 fruits'0 // indexing
 fruits'-1 // last element
 
-#string popped = fruits.pop() 
+#string popped = pop(fruits)
 popped // Banana
-fruits.push("Strawberry")
+append(fruits, "Strawberry")
 ```
 - Maps
 ```rust
@@ -108,7 +108,7 @@ fruits.push("Strawberry")
 people."Mehmet" = 77
 u32 jenniferAge = people'"Jennifer" 
 jenniferAge // 44
-people.delete("Mehmet")
+delete(people, "Mehmet")
 ```
 - structs
 ```rust

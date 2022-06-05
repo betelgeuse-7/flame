@@ -93,4 +93,28 @@ if z {} else { println("!Z") } // '!Z' will be printed
 - Trying to assign the result of a function that returns void, to a variable will cause a compile-time error.
 
 #### ```string```
-TODO
+
+- A string is a sequence of zero or more characters. 
+- Since there's no ```byte``` type in Flame, like in Go, indexing a string returns another string.
+- To get the unicode code point of a one-character (1-4 bytes) string, use ...
+>TODO: A function/method ^^^
+- To get the length of a string, use the built-in ```strLen``` function.
+- Strings are mutable in Flame.
+
+```lisp
+#string COUNTRY = "Turkiye"
+COUNTRY'1 = "ü"
+println(COUNTRY) // Türkiye
+```
+Since strings are immutable in Go, when translating the above code to Go, the original string will be copied into another string.
+
+Example Go output for the above code:
+```go
+var COUNTRY string = "Turkiye"
+var COUNTRY_1 = []rune(COUNTRY)
+COUNTRY_1[1] = 'ü'
+fmt.Println(string(COUNTRY_1))
+```
+
+#### Numeric types
+>See [Go_Spec#Numeric_Types](https://go.dev/ref/spec#Numeric_types)
