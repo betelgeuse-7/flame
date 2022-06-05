@@ -2,6 +2,8 @@
 
 This is the Flame language:
 
+Semantics of the language: [SEMANTICS](SEMANTICS.md)
+
 #### Encoding
 The Flame compiler supports UTF-8 encoded files, but you can only use ASCII when declaring variables.
 The supported line termination sequence is ASCII LF (\n). (CRLF (\r\n) is not seen as a newline, only \n).
@@ -48,7 +50,7 @@ There are three types of operators:
 !               // not operator
 
 // infix
-+ - * /         // you know what these mean
++ - * / %       // you know what these mean
 += -= *= /=     // these also
 < > <= >=       // ...
 !=              // not equal

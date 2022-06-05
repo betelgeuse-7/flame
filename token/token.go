@@ -62,6 +62,7 @@ const (
 	T_MinusMinus    TokenType = "MINUSMINUS"
 	T_Mul           TokenType = "MUL"
 	T_Div           TokenType = "DIV"
+	T_Modulus       TokenType = "MODULUS"
 	T_Eq            TokenType = "EQ"
 	T_PlusEq        TokenType = "PLUSEQ"
 	T_MinusEq       TokenType = "MINUSEQ"
@@ -83,6 +84,7 @@ const (
 	T_LtEq          TokenType = "LTEQ" // <=
 	T_Dollar        TokenType = "DOLLAR"
 	T_Colon         TokenType = "COLON"
+	T_SingleQuote   TokenType = "SINGLE_QUOTE"
 	T_Comma         TokenType = "COMMA"
 	T_Exclamation   TokenType = "EXCLAMATION"
 	T_SingleArrow   TokenType = "SINGLEARROW" // ->

@@ -53,6 +53,8 @@ var (
 	_dot          = token.Token{Typ: token.T_Dot, Lit: "."}
 	_comment      = func(lit string) token.Token { return token.Token{Typ: token.T_Comment, Lit: lit} }
 	_illegal      = func(lit string) token.Token { return token.Token{Typ: token.T_Illegal, Lit: lit} }
+	_single_quote = token.Token{Typ: token.T_SingleQuote, Lit: "'"}
+	_modulus      = token.Token{Typ: token.T_Modulus, Lit: "%"}
 )
 
 func TestScannerNext(t *testing.T) {
@@ -69,6 +71,7 @@ func TestScannerNext(t *testing.T) {
 	input += "// this is a comment\n"
 	input += "pub struct embeds ."
 	input += "\"🙂\" const string 🩸 = \"blood\""
+	input += "people'1 5 % 3"
 
 	s := New(input)
 	// we expect s.y to be 1 in the beginning
@@ -95,6 +98,7 @@ func TestScannerNext(t *testing.T) {
 		_minus, _minusminus, _plusplus, _ampersand, _and, _bitor,
 		_or, _bitxor, _pluseq, _muleq, _comment(" this is a comment"), _pub, _struct, _embeds, _dot,
 		_string("🙂"), _const, _stringkw, _illegal("🩸"), _eq, _string("blood"),
+		_ident("people"), _single_quote, _number("1"), _number("5"), _modulus, _number("3"),
 	}
 	for i, v := range got {
 		if i == len(want) {
