@@ -13,7 +13,7 @@ println(name) // Jennifer
 name = "Noam"
 println(name) // Noam
 ```
-Trying to assign a different type of value to an already initialized variable will is a compilation-time error (The program won't compile.).
+Trying to assign a different type of value to an already initialized variable is a compilation-time error (The program won't compile.).
  
 ```rust
 u32 age = 44
