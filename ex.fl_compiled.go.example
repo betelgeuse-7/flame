@@ -1,0 +1,9 @@
+package main
+
+func main() {
+var name string = "Jennifer"
+var age uint64 = 44
+var PI float32 = 3.14
+var temp float64 = 29.8
+var city string = "Amsterdam"
+}

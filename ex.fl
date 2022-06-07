@@ -1,2 +1,5 @@
 #string name = "Jennifer"
 #uint age = 44
+#f32 PI = 3.14
+float temp = 29.8
+string city = "Amsterdam"
