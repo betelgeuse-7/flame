@@ -1,13 +1,19 @@
 package ast
 
-import "flame/token"
+import (
+	"flame/token"
+	"fmt"
+)
 
 type Program struct {
 	Stmts []Stmt
 }
 
 type Stmt interface{ S() }
-type Expr interface{ E() }
+type Expr interface {
+	E()
+	Value() string
+}
 
 type VarDeclStmt struct {
 	DataType token.TokenType
@@ -23,3 +29,14 @@ type ConstDeclStmt struct {
 }
 
 func (c ConstDeclStmt) S() {}
+func (c *ConstDeclStmt) String() string {
+	return fmt.Sprintf("#%s %s = %s", string(c.Decl.DataType), c.Decl.Name, c.Decl.Value.Value())
+}
+
+type PrimitiveValue struct {
+	DataType token.TokenType
+	Val      string
+}
+
+func (p PrimitiveValue) E()            {}
+func (p PrimitiveValue) Value() string { return p.Val }

@@ -1,2 +1,2 @@
-string name = "Jennifer"
-uint age = 32
+#string name = "Jennifer"
+#uint age = 44

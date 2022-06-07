@@ -1,8 +1,6 @@
 package main
 
 import (
-	"flame/ast"
-	"flame/codegen/gogen"
 	"flame/parser"
 	"flame/scanner"
 	"fmt"
@@ -27,12 +25,10 @@ func main() {
 	scanner := scanner.New(input)
 	p := parser.New(scanner)
 	program := p.ParseProgram()
-	goCode := "package main\n\n"
-	goCode += "func main() {\n\t"
-	goCode += gogen.CompileVarDecl(program.Stmts[0].(*ast.VariableDeclarationStmt))
-	goCode += gogen.CompileVarDecl(program.Stmts[1].(*ast.VariableDeclarationStmt))
-	goCode += "}"
-	//os.WriteFile(fileName+"_compiled.go", []byte(goCode), 0777)
-	fmt.Println(goCode)
-	log.Println("Compiled Flame to Go :)")
+	if errs := p.Errors(); len(errs) > 0 {
+		for _, e := range errs {
+			fmt.Println(e)
+		}
+	}
+	fmt.Println(program.Stmts)
 }

@@ -93,7 +93,7 @@ func (s *Scanner) scanNumber() token.Token {
 
 func (s *Scanner) scanIdentOrKw() token.Token {
 	start := s.pos
-	for isAsciiLetter(s.ch) {
+	for isAsciiLetter(s.ch) || isDigit(s.ch) {
 		s.advance()
 	}
 	lit := string(s.input[start:s.pos])
