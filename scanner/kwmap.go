@@ -12,7 +12,6 @@ var keywordMap = map[string]token.Token{
 	"float":    {Typ: token.T_Float64Kw},
 	"f32":      {Typ: token.T_Float32Kw},
 	"bool":     {Typ: token.T_BoolKw},
-	"const":    {Typ: token.T_Const},
 	"return":   {Typ: token.T_Return},
 	"match":    {Typ: token.T_Match},
 	"with":     {Typ: token.T_With},

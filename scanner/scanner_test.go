@@ -8,9 +8,9 @@ import (
 var (
 	_ident        = func(Lit string) token.Token { return token.Token{Typ: token.T_Ident, Lit: Lit} }
 	_stringkw     = token.Token{Typ: token.T_StringKw, Lit: "string"}
+	_octothorp    = token.Token{Typ: token.T_Octothorp, Lit: "#"}
 	_eq           = token.Token{Typ: token.T_Eq, Lit: "="}
 	_string       = func(Lit string) token.Token { return token.Token{Typ: token.T_String, Lit: Lit} }
-	_const        = token.Token{Typ: token.T_Const, Lit: "CONST"}
 	_uintKw       = token.Token{Typ: token.T_UintKw, Lit: "uint"}
 	_number       = func(Lit string) token.Token { return token.Token{Typ: token.T_Number, Lit: Lit} }
 	_println      = token.Token{Typ: token.T_PrintlnFn, Lit: "PRINTLNFN"}
@@ -60,7 +60,7 @@ var (
 func TestScannerNext(t *testing.T) {
 	input := "string name = \"Jennifer\""
 	input += "\n"
-	input += "const age uint = 44"
+	input += "#uint age = 44"
 	input += "\n"
 	input += "println(\"hello\")"
 	input += "\n"
@@ -70,7 +70,7 @@ func TestScannerNext(t *testing.T) {
 	input += "$ << != == >=- -- ++ & && | || ^ += *="
 	input += "// this is a comment\n"
 	input += "pub struct embeds ."
-	input += "\"🙂\" const string 🩸 = \"blood\""
+	input += "\"🙂\" #string 🩸 = \"blood\""
 	input += "people'1 5 % 3"
 
 	s := New(input)
@@ -88,7 +88,7 @@ func TestScannerNext(t *testing.T) {
 		got = append(got, tok)
 	}
 	want := []token.Token{
-		_stringkw, _ident("name"), _eq, _string("Jennifer"), _const, _ident("age"), _uintKw, _eq,
+		_stringkw, _ident("name"), _eq, _string("Jennifer"), _octothorp, _uintKw, _ident("age"), _eq,
 		_number("44"), _println, _lparen, _string("hello"), _rparen, _number("61"), _plus,
 		_number("75"), _lparen, _number("12"), _mul, _number("3"), _rparen,
 		_div, _number("86"), _minus, _number("144"), _if, _lcurly, _rcurly,
@@ -97,7 +97,7 @@ func TestScannerNext(t *testing.T) {
 		_double_arrow, _dollar, _lshift, _neq, _eqeq, _geq,
 		_minus, _minusminus, _plusplus, _ampersand, _and, _bitor,
 		_or, _bitxor, _pluseq, _muleq, _comment(" this is a comment"), _pub, _struct, _embeds, _dot,
-		_string("🙂"), _const, _stringkw, _illegal("🩸"), _eq, _string("blood"),
+		_string("🙂"), _octothorp, _stringkw, _illegal("🩸"), _eq, _string("blood"),
 		_ident("people"), _single_quote, _number("1"), _number("5"), _modulus, _number("3"),
 	}
 	for i, v := range got {

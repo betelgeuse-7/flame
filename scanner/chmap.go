@@ -23,6 +23,7 @@ var singleCharMap = map[byte]token.Token{
 	'$':  {Typ: token.T_Dollar, Lit: "$"},
 	'\'': {Typ: token.T_SingleQuote, Lit: "'"},
 	'%':  {Typ: token.T_Modulus, Lit: "%"},
+	'#':  {Typ: token.T_Octothorp, Lit: "#"},
 }
 
 var doubleCharMap = map[string]token.Token{

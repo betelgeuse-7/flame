@@ -27,7 +27,6 @@ const (
 	T_Float32Kw TokenType = "float32"
 	T_BoolKw    TokenType = "bool"
 
-	T_Const    TokenType = "CONST"
 	T_Return   TokenType = "RETURN"
 	T_Match    TokenType = "MATCH"
 	T_With     TokenType = "WITH"
@@ -89,6 +88,7 @@ const (
 	T_Exclamation   TokenType = "EXCLAMATION"
 	T_SingleArrow   TokenType = "SINGLEARROW" // ->
 	T_DoubleArrow   TokenType = "DOUBLEARROW" // =>
+	T_Octothorp     TokenType = "OCTOTHORP"   // #
 
 	/* ****** Built-ins *********/
 	T_PrintlnFn TokenType = "PRINTLNFN"
