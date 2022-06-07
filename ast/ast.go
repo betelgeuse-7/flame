@@ -1,29 +1,25 @@
 package ast
 
-import (
-	"flame/token"
-)
-
-/// TODO Position information for each node.
-
-type Node interface{}
-
-type Stmt interface {
-	Node
-	stmtNode()
-}
-
-type Expr interface {
-	Node
-	exprNode()
-}
+import "flame/token"
 
 type Program struct {
 	Stmts []Stmt
 }
 
-type VariableDeclarationStmt struct {
-	DataType token.Token // data type kw token
-	Name     string      // variable name
-	Value    string
+type Stmt interface{ S() }
+type Expr interface{ E() }
+
+type VarDeclStmt struct {
+	DataType token.TokenType
+	Name     string
+	Value    Expr
 }
+
+func (v VarDeclStmt) S() {}
+
+type ConstDeclStmt struct {
+	Decl      VarDeclStmt
+	Octothorp token.TokenType
+}
+
+func (c ConstDeclStmt) S() {}

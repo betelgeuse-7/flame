@@ -46,9 +46,13 @@ func (p *Parser) peekError(t token.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
+func (p *Parser) reportErr(msg string) {
+	p.errors = append(p.errors, msg)
+}
+
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
-	program.Stmts = []ast.Stmt{}
+
 	for p.cur.Typ != token.T_Eof {
 		stmt := p.parseStmt()
 		if stmt != nil {
@@ -60,29 +64,55 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 func (p *Parser) parseStmt() ast.Stmt {
-	return p.parseVarDecl()
-	/*
-		if isDataTypeKw(p.cur.Typ) {
-			return p.parseVarDecl()
-		}
-		panic("*Parser.parseStmt: not implemented")
-	*/
+	switch p.cur.Typ {
+	case token.T_Octothorp:
+		return p.parseConstDecl()
+	}
+	return nil
 }
 
-func (p *Parser) parseVarDecl() ast.Stmt {
-	stmt := &ast.VariableDeclarationStmt{DataType: p.cur}
-	if !p.expectPeek(token.T_Ident) {
-		fmt.Printf("*Parser.parseVarDecl: p.expectPeek#1: p.peek = %s\n", p.peek)
-		return nil
-	}
-	stmt.Name = p.cur.Lit
-	if !p.expectPeek(token.T_Eq) {
-		fmt.Printf("*Parser.parseVarDecl: p.expectPeek#2: p.peek = %s\n", p.peek)
+func (p *Parser) parseConstDecl() *ast.ConstDeclStmt {
+	s := &ast.ConstDeclStmt{Octothorp: p.cur.Typ}
+	if !(isDataTypeKw(p.peek.Typ)) {
+		p.reportErr("Malformed Constant Declaration: expected a data type keyword after an octothorp.")
 		return nil
 	}
 	p.advance()
-	stmt.Value = p.cur.Lit
-	return stmt
+	s.Decl.DataType = p.cur.Typ
+	if ok := p.expectPeek(token.T_Ident); !ok {
+		return nil
+	}
+	s.Decl.Name = p.cur.Lit
+	if ok := p.expectPeek(token.T_Eq); !ok {
+		return nil
+	}
+	switch s.Decl.DataType {
+	case token.T_StringKw:
+		if ok := p.expectPeek(token.T_String); !ok {
+			return nil
+		}
+	case token.T_UintKw, token.T_Uint32Kw:
+		if ok := checkIsUint(s.Decl.DataType, p.cur.Lit); !ok {
+			p.reportErr("invalid uint/u32 value: '" + p.cur.Lit + "'")
+			return nil
+		}
+	case token.T_IntKw, token.T_Int32Kw:
+		if ok := checkIsInt(s.Decl.DataType, p.cur.Lit); !ok {
+			p.reportErr("invalid int/i32 value: '" + p.cur.Lit + "'")
+		}
+	case token.T_BoolKw:
+		if p.cur.Lit != "true" && p.cur.Lit != "false" {
+			p.reportErr("invalid value for bool type: '" + p.cur.Lit + "'")
+		}
+	case token.T_Float64Kw, token.T_Float32Kw:
+		if ok := checkIsFloat(s.Decl.DataType, p.cur.Lit); !ok {
+			p.reportErr("invalid float/f32 value: '" + p.cur.Lit + "'")
+		}
+	default:
+		panic("parseConstDecl: '" + string(s.Decl.DataType) + "' >>> NOT IMPLEMENTED")
+	}
+	p.advance()
+	return s
 }
 
 func isDataTypeKw(typ token.TokenType) bool {
