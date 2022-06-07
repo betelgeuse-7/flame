@@ -63,11 +63,31 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 func (p *Parser) parseStmt() ast.Stmt {
+	if isDataTypeKw(p.cur.Typ) {
+		return p.parseVarDecl()
+	}
 	switch p.cur.Typ {
 	case token.T_Octothorp:
 		return p.parseConstDecl()
 	}
 	return nil
+}
+
+func (p *Parser) parseVarDecl() *ast.VarDeclStmt {
+	s := &ast.VarDeclStmt{DataType: p.cur.Typ}
+	if ok := p.expectPeek(token.T_Ident); !ok {
+		return nil
+	}
+	s.Name = p.cur.Lit
+	if ok := p.expectPeek(token.T_Eq); !ok {
+		return nil
+	}
+	p.advance()
+	if ok := checkPrimitiveValue(p, s.DataType); !ok {
+		return nil
+	}
+	s.Value = ast.PrimitiveValue{DataType: s.DataType, Val: p.cur.Lit}
+	return s
 }
 
 func (p *Parser) parseConstDecl() *ast.ConstDeclStmt {
@@ -86,34 +106,8 @@ func (p *Parser) parseConstDecl() *ast.ConstDeclStmt {
 		return nil
 	}
 	p.advance()
-	switch s.Decl.DataType {
-	case token.T_StringKw:
-		if p.cur.Typ != token.T_String {
-			p.reportErr("expected next token to be %s, got %s instead", token.T_String, p.peek.Typ)
-			return nil
-		}
-	case token.T_UintKw, token.T_Uint32Kw:
-		if ok := checkIsUint(s.Decl.DataType, p.cur.Lit); !ok {
-			p.reportErr("invalid uint/u32 value: '%s'", p.cur.Lit)
-			return nil
-		}
-	case token.T_IntKw, token.T_Int32Kw:
-		if ok := checkIsInt(s.Decl.DataType, p.cur.Lit); !ok {
-			p.reportErr("invalid int/i32 value: '%s'", p.cur.Lit)
-			return nil
-		}
-	case token.T_BoolKw:
-		if p.cur.Lit != "true" && p.cur.Lit != "false" {
-			p.reportErr("invalid value for bool type: '%s'", p.cur.Lit)
-			return nil
-		}
-	case token.T_Float64Kw, token.T_Float32Kw:
-		if ok := checkIsFloat(s.Decl.DataType, p.cur.Lit); !ok {
-			p.reportErr("invalid float/f32 value: '%s'", p.cur.Lit)
-			return nil
-		}
-	default:
-		panic("parseConstDecl: '" + string(s.Decl.DataType) + "' >>> NOT IMPLEMENTED")
+	if ok := checkPrimitiveValue(p, s.Decl.DataType); !ok {
+		return nil
 	}
 	s.Decl.Value = ast.PrimitiveValue{DataType: s.Decl.DataType, Val: p.cur.Lit}
 	return s

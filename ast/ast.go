@@ -22,6 +22,9 @@ type VarDeclStmt struct {
 }
 
 func (v VarDeclStmt) S() {}
+func (v *VarDeclStmt) String() string {
+	return fmt.Sprintf("%s %s = %s", string(v.DataType), v.Name, v.Value.Value())
+}
 
 type ConstDeclStmt struct {
 	Decl      VarDeclStmt

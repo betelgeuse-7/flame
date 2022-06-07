@@ -6,6 +6,39 @@ import (
 	"strconv"
 )
 
+func checkPrimitiveValue(p *Parser, dt token.TokenType) bool {
+	switch dt {
+	case token.T_StringKw:
+		if p.cur.Typ != token.T_String {
+			p.reportErr("Expected next token to be %s, got %s instead", token.T_String, p.peek.Typ)
+			return false
+		}
+	case token.T_UintKw, token.T_Uint32Kw:
+		if ok := checkIsUint(dt, p.cur.Lit); !ok {
+			p.reportErr("invalid uint/u32 value: '%s'", p.cur.Lit)
+			return false
+		}
+	case token.T_IntKw, token.T_Int32Kw:
+		if ok := checkIsInt(dt, p.cur.Lit); !ok {
+			p.reportErr("invalid int/i32 value: '%s'", p.cur.Lit)
+			return false
+		}
+	case token.T_BoolKw:
+		if p.cur.Lit != "true" && p.cur.Lit != "false" {
+			p.reportErr("invalid value for bool type: '%s'", p.cur.Lit)
+			return false
+		}
+	case token.T_Float64Kw, token.T_Float32Kw:
+		if ok := checkIsFloat(dt, p.cur.Lit); !ok {
+			p.reportErr("invalid float/f32 value: '%s'", p.cur.Lit)
+			return false
+		}
+	default:
+		panic("parseConstDecl: '" + string(dt) + "' >>> NOT IMPLEMENTED")
+	}
+	return true
+}
+
 // ? These functions look very alike. vvvv
 
 func checkIsUint(dt token.TokenType, val string) bool {
