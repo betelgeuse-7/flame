@@ -32,18 +32,22 @@ func TestParserParseProgram(t *testing.T) {
 }
 
 func TestParserParseProgramErrors(t *testing.T) {
+	expectedErrCount := 6
 	input := `
 		#string x = 56
 		u32 y = true
 		bool z = "Hey"
+		#f32 s 8.16
+		#string pp =
+		#u32 oo = 
 	`
 	s := scanner.New(input)
 	p := New(s)
 	_ = p.ParseProgram()
-	if errs := p.Errors(); len(errs) != 3 {
-		t.Errorf("expected 3 errors in input code, but got %d errors\n", len(errs))
+	if errs := p.Errors(); len(errs) != expectedErrCount {
+		t.Fatalf("expected %d errors in input code, but got %d errors\n", expectedErrCount, len(errs))
 	}
-	t.Logf("SUCCESS! Got 3 errors\n")
+	t.Logf("SUCCESS! Got %d errors\n", expectedErrCount)
 	for i, e := range p.Errors() {
 		t.Logf("Err#%d: %s\n", i, e)
 	}
