@@ -86,7 +86,11 @@ func (p *Parser) parseVarDecl() *ast.VarDeclStmt {
 	if ok := checkPrimitiveValue(p, s.DataType); !ok {
 		return nil
 	}
-	s.Value = ast.PrimitiveValue{DataType: s.DataType, Val: p.cur.Lit}
+	val, err := giveProperValue(s.DataType, p.cur.Lit)
+	if err != nil {
+		return nil
+	}
+	s.Value = val
 	return s
 }
 
@@ -109,7 +113,11 @@ func (p *Parser) parseConstDecl() *ast.ConstDeclStmt {
 	if ok := checkPrimitiveValue(p, s.Decl.DataType); !ok {
 		return nil
 	}
-	s.Decl.Value = ast.PrimitiveValue{DataType: s.Decl.DataType, Val: p.cur.Lit}
+	val, err := giveProperValue(s.Decl.DataType, p.cur.Lit)
+	if err != nil {
+		return nil
+	}
+	s.Decl.Value = val
 	return s
 }
 

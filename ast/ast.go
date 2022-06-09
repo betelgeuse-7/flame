@@ -5,12 +5,21 @@ import (
 	"fmt"
 )
 
+// TODO ast.Expr interface ???
+
 type Program struct {
 	Stmts []Stmt
 }
 
-type Stmt interface{ S() }
+type Node interface{}
+
+type Stmt interface {
+	Node
+	S()
+}
+
 type Expr interface {
+	Node
 	E()
 	Value() string
 }
@@ -36,6 +45,7 @@ func (c *ConstDeclStmt) String() string {
 	return fmt.Sprintf("#%s %s = %s", string(c.Decl.DataType), c.Decl.Name, c.Decl.Value.Value())
 }
 
+/*
 type PrimitiveValue struct {
 	DataType token.TokenType
 	Val      string
@@ -43,3 +53,4 @@ type PrimitiveValue struct {
 
 func (p PrimitiveValue) E()            {}
 func (p PrimitiveValue) Value() string { return p.Val }
+*/
