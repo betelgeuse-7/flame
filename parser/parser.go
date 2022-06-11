@@ -42,7 +42,7 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 }
 
 func (p *Parser) peekError(t token.TokenType) {
-	msg := fmt.Sprintf("expected next token to be %s, got %s instead", t, p.peek.Typ)
+	msg := fmt.Sprintf("%d:%d Expected next token to be %s, got %s instead", p.cur.Pos.Y, p.cur.Pos.X, t, p.peek.Typ)
 	p.errors = append(p.errors, msg)
 }
 
@@ -98,7 +98,7 @@ func (p *Parser) parseVarDecl() *ast.VarDeclStmt {
 func (p *Parser) parseConstDecl() *ast.ConstDeclStmt {
 	s := &ast.ConstDeclStmt{Octothorp: p.cur.Typ}
 	if !(isDataTypeKw(p.peek.Typ)) {
-		p.reportErr("Malformed Constant Declaration: expected a data type keyword after an octothorp, got %s", p.peek.Lit)
+		p.reportErr("%d:%d Malformed Constant Declaration: expected a data type keyword after an octothorp, got %s", p.cur.Pos.Y, p.cur.Pos.X, p.peek.Lit)
 		return nil
 	}
 	p.advance()

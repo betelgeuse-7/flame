@@ -2,10 +2,6 @@ package token
 
 type TokenType string
 
-type DataType interface {
-	X()
-}
-
 const (
 	T_Eof     TokenType = "EOF"
 	T_Illegal TokenType = "ILLEGAL"
@@ -101,4 +97,11 @@ const (
 type Token struct {
 	Typ TokenType
 	Lit string
+	Pos TokenPos
+}
+
+// X -> column
+// Y -> line
+type TokenPos struct {
+	X, Y int
 }

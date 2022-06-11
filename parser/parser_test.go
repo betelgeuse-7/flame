@@ -33,14 +33,13 @@ func TestParserParseProgram(t *testing.T) {
 
 func TestParserParseProgramErrors(t *testing.T) {
 	expectedErrCount := 6
-	input := `
-		#string x = 56
-		u32 y = true
-		bool z = "Hey"
-		#f32 s 8.16
-		#string pp =
-		#u32 oo = 
-	`
+	input := "#string x = 56\n"
+	input += "u32 y = true\n"
+	input += "bool z = \"Hey\"\n"
+	input += "#f32 s 8.16\n"
+	input += "#string pp =\n"
+	input += "#u32 oo =\n"
+
 	s := scanner.New(input)
 	p := New(s)
 	_ = p.ParseProgram()

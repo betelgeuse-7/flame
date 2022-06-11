@@ -37,7 +37,7 @@ type VarDeclStmt struct {
 
 func (v VarDeclStmt) S() {}
 func (v *VarDeclStmt) String() string {
-	return fmt.Sprintf("%s %s = %s", string(v.DataType), v.Name, v.Value.Value())
+	return fmt.Sprintf("%s %s = %s", string(v.DataType), v.Name, v.Value)
 }
 
 type ConstDeclStmt struct {
@@ -47,7 +47,7 @@ type ConstDeclStmt struct {
 
 func (c ConstDeclStmt) S() {}
 func (c *ConstDeclStmt) String() string {
-	return fmt.Sprintf("#%s %s = %s", string(c.Decl.DataType), c.Decl.Name, c.Decl.Value.Value())
+	return fmt.Sprintf("#%s %s = %s", string(c.Decl.DataType), c.Decl.Name, c.Decl.Value)
 }
 
 type PrefixOp struct {
