@@ -1,11 +1,5 @@
 package gogen
 
-import (
-	"flame/ast"
-	"flame/token"
-	"fmt"
-)
-
 var flameGoKws = map[string]string{
 	"string": "string",
 	"uint":   "uint64",
@@ -17,6 +11,7 @@ var flameGoKws = map[string]string{
 	"bool":   "bool",
 }
 
+/*
 func Compile(program *ast.Program) string {
 	res := ""
 	for _, stmt := range program.Stmts {
@@ -34,11 +29,12 @@ func Compile(program *ast.Program) string {
 			decl := stmt.(*ast.VarDeclStmt)
 			goDataType := flameGoKws[string(decl.DataType)]
 			if decl.DataType == token.T_StringKw {
-				res += fmt.Sprintf("var %s %s = \"%s\"\n", decl.Name, goDataType, decl.Value.Value())
+				res += fmt.Sprintf("var %s %s = \"%s\"\n", decl.Name, goDataType, decl.Value)
 			} else {
-				res += fmt.Sprintf("var %s %s = %s\n", decl.Name, goDataType, decl.Value.Value())
+				res += fmt.Sprintf("var %s %s = %s\n", decl.Name, goDataType, decl.Value)
 			}
 		}
 	}
 	return res
 }
+*/

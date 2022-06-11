@@ -157,3 +157,12 @@ func checkIsFloat(dt token.TokenType, val string) bool {
 	}
 	return true
 }
+
+func isDataTypeKw(typ token.TokenType) bool {
+	for _, v := range dataTypeKws {
+		if typ == v {
+			return true
+		}
+	}
+	return false
+}

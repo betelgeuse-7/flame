@@ -69,8 +69,9 @@ func (p *Parser) parseStmt() ast.Stmt {
 	switch p.cur.Typ {
 	case token.T_Octothorp:
 		return p.parseConstDecl()
+	default:
+		return p.parseExprStmt()
 	}
-	return nil
 }
 
 func (p *Parser) parseVarDecl() *ast.VarDeclStmt {
@@ -121,11 +122,9 @@ func (p *Parser) parseConstDecl() *ast.ConstDeclStmt {
 	return s
 }
 
-func isDataTypeKw(typ token.TokenType) bool {
-	for _, v := range dataTypeKws {
-		if typ == v {
-			return true
-		}
-	}
-	return false
+func (p *Parser) parseExprStmt() *ast.ExprStmt {
+	// PREFIX: 	++ + -- - ( * & ...
+	// INFIX: 	+ - / * % ...
+	// POSTFIX: ++ -- ' ...
+	return nil
 }

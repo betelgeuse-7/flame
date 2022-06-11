@@ -21,8 +21,13 @@ type Stmt interface {
 type Expr interface {
 	Node
 	E()
-	Value() string
 }
+
+type ExprStmt struct {
+	Expr
+}
+
+func (e ExprStmt) S() {}
 
 type VarDeclStmt struct {
 	DataType token.TokenType
@@ -45,12 +50,22 @@ func (c *ConstDeclStmt) String() string {
 	return fmt.Sprintf("#%s %s = %s", string(c.Decl.DataType), c.Decl.Name, c.Decl.Value.Value())
 }
 
-/*
-type PrimitiveValue struct {
-	DataType token.TokenType
-	Val      string
+type PrefixOp struct {
+	Operator
+	Rhs Expr
 }
 
-func (p PrimitiveValue) E()            {}
-func (p PrimitiveValue) Value() string { return p.Val }
-*/
+func (p PrefixOp) E() {}
+
+type BinOp struct {
+	Lhs Expr
+	Operator
+	Rhs Expr
+}
+
+func (b BinOp) E() {}
+
+type PostfixOp struct {
+	Lhs Expr
+	Operator
+}
