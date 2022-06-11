@@ -7,6 +7,8 @@ import (
 	"fmt"
 )
 
+// TODO Fix line numbers in parser errors.
+
 type Parser struct {
 	scanner *scanner.Scanner
 	cur     token.Token
