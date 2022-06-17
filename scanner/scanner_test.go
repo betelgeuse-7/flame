@@ -11,8 +11,10 @@ var (
 	_octothorp    = token.Token{Typ: token.T_Octothorp, Lit: "#"}
 	_eq           = token.Token{Typ: token.T_Eq, Lit: "="}
 	_string       = func(Lit string) token.Token { return token.Token{Typ: token.T_String, Lit: Lit} }
+	_i64          = func(lit string) token.Token { return token.Token{Typ: token.T_Int, Lit: lit} }
+	_f64          = func(lit string) token.Token { return token.Token{Typ: token.T_Float64, Lit: lit} }
+	_u64          = func(lit string) token.Token { return token.Token{Typ: token.T_Uint, Lit: lit} }
 	_uintKw       = token.Token{Typ: token.T_UintKw, Lit: "uint"}
-	_number       = func(Lit string) token.Token { return token.Token{Typ: token.T_Number, Lit: Lit} }
 	_println      = token.Token{Typ: token.T_PrintlnFn, Lit: "PRINTLNFN"}
 	_lparen       = token.Token{Typ: token.T_Lparen, Lit: "("}
 	_rparen       = token.Token{Typ: token.T_Rparen, Lit: ")"}
@@ -27,7 +29,7 @@ var (
 	_forever      = token.Token{Typ: token.T_Forever, Lit: "FOREVER"}
 	_foreach      = token.Token{Typ: token.T_Foreach, Lit: "FOREACH"}
 	_in           = token.Token{Typ: token.T_In, Lit: "IN"}
-	_true         = token.Token{Typ: token.T_True, Lit: "TRUE"}
+	_true         = token.Token{Typ: token.T_True, Lit: "true"}
 	_comma        = token.Token{Typ: token.T_Comma, Lit: ","}
 	_match        = token.Token{Typ: token.T_Match, Lit: "MATCH"}
 	_with         = token.Token{Typ: token.T_With, Lit: "WITH"}
@@ -71,7 +73,7 @@ func TestScannerNext(t *testing.T) {
 	input += "// this is a comment\n"
 	input += "pub struct embeds ."
 	input += "\"🙂\" #string 🩸 = \"blood\""
-	input += "people'1 5 % 3"
+	input += "people'1 5 % 3 -178.6 -168"
 
 	s := New(input)
 	// we expect s.y to be 1 in the beginning
@@ -89,16 +91,16 @@ func TestScannerNext(t *testing.T) {
 	}
 	want := []token.Token{
 		_stringkw, _ident("name"), _eq, _string("Jennifer"), _octothorp, _uintKw, _ident("age"), _eq,
-		_number("44"), _println, _lparen, _string("hello"), _rparen, _number("61"), _plus,
-		_number("75"), _lparen, _number("12"), _mul, _number("3"), _rparen,
-		_div, _number("86"), _minus, _number("144"), _if, _lcurly, _rcurly,
+		_u64("44"), _println, _lparen, _string("hello"), _rparen, _u64("61"), _plus,
+		_u64("75"), _lparen, _u64("12"), _mul, _u64("3"), _rparen,
+		_div, _u64("86"), _minus, _u64("144"), _if, _lcurly, _rcurly,
 		_forever, _foreach, _ident("_"), _comma, _ident("item"), _in,
-		_true, _comma, _number("10.5"), _match, _with, _single_arrow,
+		_true, _comma, _f64("10.5"), _match, _with, _single_arrow,
 		_double_arrow, _dollar, _lshift, _neq, _eqeq, _geq,
 		_minus, _minusminus, _plusplus, _ampersand, _and, _bitor,
 		_or, _bitxor, _pluseq, _muleq, _comment(" this is a comment"), _pub, _struct, _embeds, _dot,
 		_string("🙂"), _octothorp, _stringkw, _illegal("🩸"), _eq, _string("blood"),
-		_ident("people"), _single_quote, _number("1"), _number("5"), _modulus, _number("3"),
+		_ident("people"), _single_quote, _u64("1"), _u64("5"), _modulus, _u64("3"), _f64("-178.6"), _i64("-168"),
 	}
 	for i, v := range got {
 		if i == len(want) {

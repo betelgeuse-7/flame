@@ -78,6 +78,12 @@ func (s *Scanner) Next() token.Token {
 		return doubleCharTok
 	}
 	singleCharTok, ok := singleCharMap[byte(s.ch)]
+	// is it a number starting with a minus? (e.g -5)
+	if singleCharTok.Typ == token.T_Minus {
+		if peek := s.peek(); isDigit(peek) {
+			return s.scanNumber()
+		}
+	}
 	if ok {
 		s.advance()
 		return singleCharTok
@@ -88,12 +94,30 @@ func (s *Scanner) Next() token.Token {
 }
 
 func (s *Scanner) scanNumber() token.Token {
+	startsWithMinus := s.ch == '-'
+	dots := 0
 	start := s.pos
+	s.advance()
 	for isDigit(s.ch) || s.ch == '.' {
+		// floats can't have more than one dot
+		if dots > 1 {
+			break
+		}
+		if s.ch == '.' {
+			dots++
+		}
 		s.advance()
 	}
 	lit := string(s.input[start:s.pos])
-	return token.Token{Typ: token.T_Number, Lit: lit, Pos: token.TokenPos{X: s.x, Y: s.y}}
+	tok := token.Token{Lit: lit, Pos: token.TokenPos{X: s.x, Y: s.y}}
+	if dots > 0 {
+		tok.Typ = token.T_Float64
+	} else if startsWithMinus {
+		tok.Typ = token.T_Int
+	} else {
+		tok.Typ = token.T_Uint
+	}
+	return tok
 }
 
 func (s *Scanner) scanIdentOrKw() token.Token {

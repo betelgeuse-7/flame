@@ -9,7 +9,13 @@ const (
 
 	T_Ident   TokenType = "IDENT"
 	T_String  TokenType = "STRING"
-	T_Number  TokenType = "NUMBER"
+	T_Uint    TokenType = "UINT"
+	T_Uint32  TokenType = "UINT32"
+	T_Int     TokenType = "INT"
+	T_Int32   TokenType = "INT32"
+	T_Float64 TokenType = "FLOAT64"
+	T_Float32 TokenType = "FLOAT32"
+	T_Bool    TokenType = "BOOL"
 	T_Comment TokenType = "COMMENT"
 
 	/* ****** KEYWORDS *********/

@@ -1,8 +1,17 @@
 package ast
 
-type SignedIntegerLiteral interface{ SIL() }
-type UnsignedIntegerLiteral interface{ USIL() }
-type IFloatLiteral interface{ FL() }
+type SignedIntegerLiteral interface {
+	Expr
+	SIL()
+}
+type UnsignedIntegerLiteral interface {
+	Expr
+	USIL()
+}
+type IFloatLiteral interface {
+	Expr
+	FL()
+}
 
 type StringLiteral struct {
 	Val string

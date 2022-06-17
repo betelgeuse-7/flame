@@ -15,12 +15,17 @@ type Parser struct {
 	cur     token.Token
 	peek    token.Token
 	errors  []string
+
+	// infix expression parsing methods
+	infixParseFns map[token.TokenType]infixParseFn
 }
 
 func New(scanner *scanner.Scanner) *Parser {
 	p := &Parser{
-		scanner: scanner,
+		scanner:       scanner,
+		infixParseFns: make(map[token.TokenType]infixParseFn),
 	}
+	p.registerAllExprParseFns()
 	p.advance()
 	p.advance()
 	return p
@@ -90,33 +95,7 @@ func (p *Parser) parseVarDecl() *ast.VarDeclStmt {
 	if ok := checkPrimitiveValue(p, s.DataType); !ok {
 		return nil
 	}
-	switch s.DataType {
-	case token.T_StringKw:
-		s.Value = p.parseStringLiteral()
-	case token.T_IntKw, token.T_Int32Kw:
-		val := p.parseSignedIntegerLiteral(s.DataType)
-		if _, ok := val.(*ast.IntLiteral); ok {
-			s.Value = val.(*ast.IntLiteral)
-		} else if _, ok := val.(*ast.I32Literal); ok {
-			s.Value = val.(*ast.I32Literal)
-		}
-	case token.T_UintKw, token.T_Uint32Kw:
-		val := p.parseUnsignedIntegerLiteral(s.DataType)
-		if _, ok := val.(*ast.UintLiteral); ok {
-			s.Value = val.(*ast.UintLiteral)
-		} else if _, ok := val.(*ast.U32Literal); ok {
-			s.Value = val.(*ast.U32Literal)
-		}
-	case token.T_Float64Kw, token.T_Float32Kw:
-		val := p.parseFloatLiteral(s.DataType)
-		if _, ok := val.(*ast.FloatLiteral); ok {
-			s.Value = val.(*ast.FloatLiteral)
-		} else if _, ok := val.(*ast.F32Literal); ok {
-			s.Value = val.(*ast.F32Literal)
-		}
-	case token.T_BoolKw:
-		s.Value = p.parseBoolLiteral()
-	}
+	s.Value = p.parseExpr()
 	return s
 }
 
@@ -139,56 +118,54 @@ func (p *Parser) parseConstDecl() *ast.ConstDeclStmt {
 	if ok := checkPrimitiveValue(p, s.Decl.DataType); !ok {
 		return nil
 	}
-	switch s.Decl.DataType {
-	case token.T_StringKw:
-		s.Decl.Value = p.parseStringLiteral()
-	case token.T_IntKw, token.T_Int32Kw:
-		val := p.parseSignedIntegerLiteral(s.Decl.DataType)
-		if _, ok := val.(*ast.IntLiteral); ok {
-			s.Decl.Value = val.(*ast.IntLiteral)
-		} else if _, ok := val.(*ast.I32Literal); ok {
-			s.Decl.Value = val.(*ast.I32Literal)
-		}
-	case token.T_UintKw, token.T_Uint32Kw:
-		val := p.parseUnsignedIntegerLiteral(s.Decl.DataType)
-		if _, ok := val.(*ast.UintLiteral); ok {
-			s.Decl.Value = val.(*ast.UintLiteral)
-		} else if _, ok := val.(*ast.U32Literal); ok {
-			s.Decl.Value = val.(*ast.U32Literal)
-		}
-	case token.T_Float64Kw, token.T_Float32Kw:
-		val := p.parseFloatLiteral(s.Decl.DataType)
-		if _, ok := val.(*ast.FloatLiteral); ok {
-			s.Decl.Value = val.(*ast.FloatLiteral)
-		} else if _, ok := val.(*ast.F32Literal); ok {
-			s.Decl.Value = val.(*ast.F32Literal)
-		}
-	case token.T_BoolKw:
-		s.Decl.Value = p.parseBoolLiteral()
-	}
+	s.Decl.Value = p.parseExpr()
 	return s
 }
 
 func (p *Parser) parseExprStmt() *ast.ExprStmt {
-	// PREFIX: 	++ + -- - ( * & ...
-	// INFIX: 	+ - / * % ...
-	// POSTFIX: ++ -- ' ...
-	return nil
+	stmt := &ast.ExprStmt{}
+	stmt.Expr = p.parseExpr()
+	return stmt
+}
+
+func (p *Parser) parseExpr() ast.Expr {
+	// TODO error handling
+	var leftExpr ast.Expr
+	switch p.cur.Typ {
+	case token.T_Uint, token.T_Uint32:
+		leftExpr = p.parseUnsignedIntegerLiteral()
+	case token.T_Int, token.T_Int32:
+		leftExpr = p.parseSignedIntegerLiteral()
+	case token.T_Float32, token.T_Float64:
+		leftExpr = p.parseFloatLiteral()
+	case token.T_Bool:
+		leftExpr = p.parseBoolLiteral()
+	case token.T_String:
+		leftExpr = p.parseStringLiteral()
+	}
+	// is this an infix expr, or a prefix expr ?
+	infixFn := p.infixParseFns[p.peek.Typ]
+	if infixFn == nil {
+		return leftExpr
+	}
+	p.advance()
+	expr := infixFn(leftExpr)
+	return expr
 }
 
 func (p *Parser) parseStringLiteral() *ast.StringLiteral {
 	return &ast.StringLiteral{Val: p.cur.Lit}
 }
 
-func (p *Parser) parseSignedIntegerLiteral(dt token.TokenType) ast.SignedIntegerLiteral {
-	switch dt {
-	case token.T_IntKw:
+func (p *Parser) parseSignedIntegerLiteral() ast.SignedIntegerLiteral {
+	switch p.cur.Typ {
+	case token.T_Int:
 		val, err := strconv.ParseInt(p.cur.Lit, 10, 64)
 		if err != nil {
 			return nil
 		}
 		return &ast.IntLiteral{ValStr: p.cur.Lit, Val: val}
-	case token.T_Int32Kw:
+	case token.T_Int32:
 		val, err := strconv.ParseInt(p.cur.Lit, 10, 32)
 		if err != nil {
 			return nil
@@ -198,15 +175,15 @@ func (p *Parser) parseSignedIntegerLiteral(dt token.TokenType) ast.SignedInteger
 	return nil
 }
 
-func (p *Parser) parseUnsignedIntegerLiteral(dt token.TokenType) ast.UnsignedIntegerLiteral {
-	switch dt {
-	case token.T_UintKw:
+func (p *Parser) parseUnsignedIntegerLiteral() ast.UnsignedIntegerLiteral {
+	switch p.cur.Typ {
+	case token.T_Uint:
 		val, err := strconv.ParseUint(p.cur.Lit, 10, 64)
 		if err != nil {
 			return nil
 		}
 		return &ast.UintLiteral{ValStr: p.cur.Lit, Val: val}
-	case token.T_Uint32Kw:
+	case token.T_Uint32:
 		val, err := strconv.ParseUint(p.cur.Lit, 10, 32)
 		if err != nil {
 			return nil
@@ -216,15 +193,15 @@ func (p *Parser) parseUnsignedIntegerLiteral(dt token.TokenType) ast.UnsignedInt
 	return nil
 }
 
-func (p *Parser) parseFloatLiteral(dt token.TokenType) ast.IFloatLiteral {
-	switch dt {
-	case token.T_Float64Kw:
+func (p *Parser) parseFloatLiteral() ast.IFloatLiteral {
+	switch p.cur.Typ {
+	case token.T_Float64:
 		val, err := strconv.ParseFloat(p.cur.Lit, 64)
 		if err != nil {
 			return nil
 		}
 		return &ast.FloatLiteral{ValStr: p.cur.Lit, Val: val}
-	case token.T_Float32Kw:
+	case token.T_Float32:
 		val, err := strconv.ParseFloat(p.cur.Lit, 32)
 		if err != nil {
 			return nil
@@ -240,4 +217,14 @@ func (p *Parser) parseBoolLiteral() *ast.BooleanLiteral {
 		return nil
 	}
 	return &ast.BooleanLiteral{ValStr: p.cur.Lit, Val: val}
+}
+
+func (p *Parser) parseInfixExpr(left ast.Expr) ast.Expr {
+	expr := &ast.BinOp{
+		Lhs:      left,
+		Operator: p.cur.Lit,
+	}
+	p.advance()
+	expr.Rhs = p.parseExpr()
+	return expr
 }

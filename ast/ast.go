@@ -51,21 +51,25 @@ func (c *ConstDeclStmt) String() string {
 }
 
 type PrefixOp struct {
-	Operator
-	Rhs Expr
+	Operator string
+	Rhs      Expr
 }
 
 func (p PrefixOp) E() {}
 
 type BinOp struct {
-	Lhs Expr
-	Operator
-	Rhs Expr
+	Lhs      Expr
+	Operator string
+	Rhs      Expr
 }
 
 func (b BinOp) E() {}
+func (b *BinOp) String() string {
+	str := fmt.Sprintf("%s %s %s", b.Lhs, b.Operator, b.Rhs)
+	return str
+}
 
 type PostfixOp struct {
-	Lhs Expr
-	Operator
+	Lhs      Expr
+	Operator string
 }

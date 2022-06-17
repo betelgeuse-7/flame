@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"flame/ast"
 	"flame/scanner"
 	"strings"
 	"testing"
@@ -50,4 +51,16 @@ func TestParserParseProgramErrors(t *testing.T) {
 	for i, e := range p.Errors() {
 		t.Logf("Err#%d: %s\n", i, e)
 	}
+}
+
+func TestParserParseBinOpExprStmt(t *testing.T) {
+	input := "#int x = 5 + 3\n"
+	input += "u32 y = 55 + -16 * 558"
+
+	s := scanner.New(input)
+	p := New(s)
+	program := p.ParseProgram()
+	t.Logf("statement#1 value: %s", program.Stmts[0].(*ast.ConstDeclStmt).Decl.Value)
+	t.Logf("statement#2 value: %s", program.Stmts[1].(*ast.VarDeclStmt).Value)
+	t.Logf("STATEMENTS: %s", program.Stmts)
 }
