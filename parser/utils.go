@@ -1,57 +1,10 @@
 package parser
 
 import (
-	"errors"
-	"flame/ast"
 	"flame/token"
 	"math"
 	"strconv"
 )
-
-// TODO refactor this
-//
-// return parsed value from valLiteral, according to the data type (dt).
-// returned ast.Expr value can be used to set *ast.VarDeclstm.Value, for example.
-func giveProperValue(dt token.TokenType, valLiteral string) (ast.Expr, error) {
-	switch dt {
-	case token.T_StringKw:
-		return &ast.StringLiteral{Val: valLiteral}, nil
-	case token.T_IntKw, token.T_Int32Kw:
-		val, err := strconv.ParseInt(valLiteral, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-		if dt == token.T_Int32Kw {
-			return &ast.I32Literal{ValStr: valLiteral, Val: int32(val)}, nil
-		}
-		return &ast.IntLiteral{ValStr: valLiteral, Val: val}, nil
-	case token.T_UintKw, token.T_Uint32Kw:
-		val, err := strconv.ParseUint(valLiteral, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-		if dt == token.T_Uint32Kw {
-			return &ast.U32Literal{ValStr: valLiteral, Val: uint32(val)}, nil
-		}
-		return &ast.UintLiteral{ValStr: valLiteral, Val: val}, nil
-	case token.T_Float64Kw, token.T_Float32Kw:
-		val, err := strconv.ParseFloat(valLiteral, 64)
-		if err != nil {
-			return nil, err
-		}
-		if dt == token.T_Float32Kw {
-			return &ast.F32Literal{ValStr: valLiteral, Val: float32(val)}, nil
-		}
-		return &ast.FloatLiteral{ValStr: valLiteral, Val: val}, nil
-	case token.T_BoolKw:
-		val, err := strconv.ParseBool(valLiteral)
-		if err != nil {
-			return nil, err
-		}
-		return &ast.BooleanLiteral{ValStr: valLiteral, Val: val}, nil
-	}
-	return nil, errors.New("not a primitive value")
-}
 
 func checkPrimitiveValue(p *Parser, dt token.TokenType) bool {
 	switch dt {

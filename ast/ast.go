@@ -5,8 +5,6 @@ import (
 	"fmt"
 )
 
-// TODO ast.Expr interface ???
-
 type Program struct {
 	Stmts []Stmt
 }
@@ -16,11 +14,13 @@ type Node interface{}
 type Stmt interface {
 	Node
 	S()
+	String() string
 }
 
 type Expr interface {
 	Node
 	E()
+	String() string
 }
 
 type ExprStmt struct {

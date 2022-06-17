@@ -5,6 +5,7 @@ import (
 	"flame/scanner"
 	"flame/token"
 	"fmt"
+	"strconv"
 )
 
 // TODO Fix line numbers in parser errors.
@@ -89,11 +90,33 @@ func (p *Parser) parseVarDecl() *ast.VarDeclStmt {
 	if ok := checkPrimitiveValue(p, s.DataType); !ok {
 		return nil
 	}
-	val, err := giveProperValue(s.DataType, p.cur.Lit)
-	if err != nil {
-		return nil
+	switch s.DataType {
+	case token.T_StringKw:
+		s.Value = p.parseStringLiteral()
+	case token.T_IntKw, token.T_Int32Kw:
+		val := p.parseSignedIntegerLiteral(s.DataType)
+		if _, ok := val.(*ast.IntLiteral); ok {
+			s.Value = val.(*ast.IntLiteral)
+		} else if _, ok := val.(*ast.I32Literal); ok {
+			s.Value = val.(*ast.I32Literal)
+		}
+	case token.T_UintKw, token.T_Uint32Kw:
+		val := p.parseUnsignedIntegerLiteral(s.DataType)
+		if _, ok := val.(*ast.UintLiteral); ok {
+			s.Value = val.(*ast.UintLiteral)
+		} else if _, ok := val.(*ast.U32Literal); ok {
+			s.Value = val.(*ast.U32Literal)
+		}
+	case token.T_Float64Kw, token.T_Float32Kw:
+		val := p.parseFloatLiteral(s.DataType)
+		if _, ok := val.(*ast.FloatLiteral); ok {
+			s.Value = val.(*ast.FloatLiteral)
+		} else if _, ok := val.(*ast.F32Literal); ok {
+			s.Value = val.(*ast.F32Literal)
+		}
+	case token.T_BoolKw:
+		s.Value = p.parseBoolLiteral()
 	}
-	s.Value = val
 	return s
 }
 
@@ -116,11 +139,33 @@ func (p *Parser) parseConstDecl() *ast.ConstDeclStmt {
 	if ok := checkPrimitiveValue(p, s.Decl.DataType); !ok {
 		return nil
 	}
-	val, err := giveProperValue(s.Decl.DataType, p.cur.Lit)
-	if err != nil {
-		return nil
+	switch s.Decl.DataType {
+	case token.T_StringKw:
+		s.Decl.Value = p.parseStringLiteral()
+	case token.T_IntKw, token.T_Int32Kw:
+		val := p.parseSignedIntegerLiteral(s.Decl.DataType)
+		if _, ok := val.(*ast.IntLiteral); ok {
+			s.Decl.Value = val.(*ast.IntLiteral)
+		} else if _, ok := val.(*ast.I32Literal); ok {
+			s.Decl.Value = val.(*ast.I32Literal)
+		}
+	case token.T_UintKw, token.T_Uint32Kw:
+		val := p.parseUnsignedIntegerLiteral(s.Decl.DataType)
+		if _, ok := val.(*ast.UintLiteral); ok {
+			s.Decl.Value = val.(*ast.UintLiteral)
+		} else if _, ok := val.(*ast.U32Literal); ok {
+			s.Decl.Value = val.(*ast.U32Literal)
+		}
+	case token.T_Float64Kw, token.T_Float32Kw:
+		val := p.parseFloatLiteral(s.Decl.DataType)
+		if _, ok := val.(*ast.FloatLiteral); ok {
+			s.Decl.Value = val.(*ast.FloatLiteral)
+		} else if _, ok := val.(*ast.F32Literal); ok {
+			s.Decl.Value = val.(*ast.F32Literal)
+		}
+	case token.T_BoolKw:
+		s.Decl.Value = p.parseBoolLiteral()
 	}
-	s.Decl.Value = val
 	return s
 }
 
@@ -129,4 +174,70 @@ func (p *Parser) parseExprStmt() *ast.ExprStmt {
 	// INFIX: 	+ - / * % ...
 	// POSTFIX: ++ -- ' ...
 	return nil
+}
+
+func (p *Parser) parseStringLiteral() *ast.StringLiteral {
+	return &ast.StringLiteral{Val: p.cur.Lit}
+}
+
+func (p *Parser) parseSignedIntegerLiteral(dt token.TokenType) ast.SignedIntegerLiteral {
+	switch dt {
+	case token.T_IntKw:
+		val, err := strconv.ParseInt(p.cur.Lit, 10, 64)
+		if err != nil {
+			return nil
+		}
+		return &ast.IntLiteral{ValStr: p.cur.Lit, Val: val}
+	case token.T_Int32Kw:
+		val, err := strconv.ParseInt(p.cur.Lit, 10, 32)
+		if err != nil {
+			return nil
+		}
+		return &ast.I32Literal{ValStr: p.cur.Lit, Val: int32(val)}
+	}
+	return nil
+}
+
+func (p *Parser) parseUnsignedIntegerLiteral(dt token.TokenType) ast.UnsignedIntegerLiteral {
+	switch dt {
+	case token.T_UintKw:
+		val, err := strconv.ParseUint(p.cur.Lit, 10, 64)
+		if err != nil {
+			return nil
+		}
+		return &ast.UintLiteral{ValStr: p.cur.Lit, Val: val}
+	case token.T_Uint32Kw:
+		val, err := strconv.ParseUint(p.cur.Lit, 10, 32)
+		if err != nil {
+			return nil
+		}
+		return &ast.U32Literal{ValStr: p.cur.Lit, Val: uint32(val)}
+	}
+	return nil
+}
+
+func (p *Parser) parseFloatLiteral(dt token.TokenType) ast.IFloatLiteral {
+	switch dt {
+	case token.T_Float64Kw:
+		val, err := strconv.ParseFloat(p.cur.Lit, 64)
+		if err != nil {
+			return nil
+		}
+		return &ast.FloatLiteral{ValStr: p.cur.Lit, Val: val}
+	case token.T_Float32Kw:
+		val, err := strconv.ParseFloat(p.cur.Lit, 32)
+		if err != nil {
+			return nil
+		}
+		return &ast.F32Literal{ValStr: p.cur.Lit, Val: float32(val)}
+	}
+	return nil
+}
+
+func (p *Parser) parseBoolLiteral() *ast.BooleanLiteral {
+	val, err := strconv.ParseBool(p.cur.Lit)
+	if err != nil {
+		return nil
+	}
+	return &ast.BooleanLiteral{ValStr: p.cur.Lit, Val: val}
 }
