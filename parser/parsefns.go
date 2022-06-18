@@ -9,6 +9,7 @@ type infixParseFn func(ast.Expr) ast.Expr
 
 func (p *Parser) registerAllExprParseFns() {
 	/* INFIX */
+	//p.registerInfixFn(token.T_Ident, p.parseInfixExpr)
 	p.registerInfixFn(token.T_Plus, p.parseInfixExpr)
 	p.registerInfixFn(token.T_Minus, p.parseInfixExpr)
 	p.registerInfixFn(token.T_Div, p.parseInfixExpr)
@@ -22,7 +23,9 @@ func (p *Parser) registerAllExprParseFns() {
 	p.registerInfixFn(token.T_DoubleEq, p.parseInfixExpr)
 	p.registerInfixFn(token.T_And, p.parseInfixExpr)
 	p.registerInfixFn(token.T_Or, p.parseInfixExpr)
-	p.registerInfixFn(token.T_SingleQuote, p.parseInfixExpr)
+	p.registerInfixFn(token.T_BitLeftShift, p.parseInfixExpr)
+	p.registerInfixFn(token.T_BitRightShift, p.parseInfixExpr)
+	//p.registerInfixFn(token.T_SingleQuote, p.parseInfixExpr)
 }
 
 func (p *Parser) registerInfixFn(tt token.TokenType, fn infixParseFn) {

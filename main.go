@@ -8,6 +8,13 @@ import (
 	"os"
 )
 
+// scanner --> parser --> env      --> typecheck --> codegen
+// tokens  --> ast    --> env,ast  --> ast       --> code
+//
+// eval, evaluates the ast, and creates an environment, to keep the variables, types, etc. in.
+// typecheck, checks if there's any type errors (e.g adding an int and a string).
+// codegen spits out code. (Go)
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatalln("I need a file name")

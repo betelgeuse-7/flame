@@ -77,6 +77,8 @@ func (p *Parser) parseStmt() ast.Stmt {
 	switch p.cur.Typ {
 	case token.T_Octothorp:
 		return p.parseConstDecl()
+	case token.T_If:
+		return p.parseIfStmt()
 	default:
 		return p.parseExprStmt()
 	}
@@ -226,5 +228,52 @@ func (p *Parser) parseInfixExpr(left ast.Expr) ast.Expr {
 	}
 	p.advance()
 	expr.Rhs = p.parseExpr()
+	if expr.Rhs == nil {
+		x := p.cur.Pos.X
+		y := p.cur.Pos.Y
+		p.reportErr("%d:%d Expected another expression after '%s', but got nothing", y, x, expr.Operator)
+		return nil
+	}
 	return expr
+}
+
+func (p *Parser) parseIfStmt() *ast.IfStmt {
+	stmt := &ast.IfStmt{}
+	p.advance()
+	stmt.Cond = p.parseExpr()
+	if stmt.Cond == nil {
+		p.reportErr("%d:%d No condition in if statement", p.cur.Pos.Y, p.cur.Pos.X)
+		return nil
+	}
+	if ok := p.expectPeek(token.T_LCurly); !ok {
+		return nil
+	}
+	for p.peek.Typ != token.T_RCurly {
+		p.advance()
+		stmt.Body = append(stmt.Body, p.parseStmt())
+	}
+	if ok := p.expectPeek(token.T_RCurly); !ok {
+		return nil
+	}
+	if p.peek.Typ == token.T_ElseIf {
+		p.advance()
+		stmt.Alternative = p.parseIfStmt()
+	}
+	if p.peek.Typ == token.T_Else {
+		p.advance()
+		elseBranch := []ast.Stmt{}
+		if ok := p.expectPeek(token.T_LCurly); !ok {
+			return nil
+		}
+		for p.peek.Typ != token.T_RCurly {
+			p.advance()
+			elseBranch = append(elseBranch, p.parseStmt())
+		}
+		if ok := p.expectPeek(token.T_RCurly); !ok {
+			return nil
+		}
+		p.advance()
+		stmt.Default = elseBranch
+	}
+	return stmt
 }

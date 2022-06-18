@@ -163,8 +163,6 @@ if a == 5 {
     // ...
 } elseif {} else {}
 
-if true 5 else 6
-
 // incremented variable is i, repeat 6 times. equivalent to: for(int i = 0; i < 6; i++) {//...} in C
 repeat 6, i {
     println(i)

@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"flame/ast"
 	"flame/scanner"
 	"strings"
 	"testing"
@@ -55,12 +54,29 @@ func TestParserParseProgramErrors(t *testing.T) {
 
 func TestParserParseBinOpExprStmt(t *testing.T) {
 	input := "#int x = 5 + 3\n"
-	input += "u32 y = 55 + -16 * 558"
+	input += "u32 y = 55 + -16 * 558\n"
+	input += "5 +\n"
+	input += "4 != 6 \"a\" && \"b\" \n"
+	input += "5 -\n"
+	input += "2 << 1\n"
+	input += "-16.7 >> \n"
 
 	s := scanner.New(input)
 	p := New(s)
 	program := p.ParseProgram()
-	t.Logf("statement#1 value: %s", program.Stmts[0].(*ast.ConstDeclStmt).Decl.Value)
-	t.Logf("statement#2 value: %s", program.Stmts[1].(*ast.VarDeclStmt).Value)
-	t.Logf("STATEMENTS: %s", program.Stmts)
+	t.Logf("STATEMENTS: %s", program.String())
+	t.Logf("errors len: %d\n", len(p.errors))
+	t.Logf("Parser errors: %v", p.Errors())
+}
+
+func TestParserParseIfStmt(t *testing.T) {
+	input := "if true { #string x = \"x\"} elseif false { } else { }\n"
+	s := scanner.New(input)
+	p := New(s)
+	program := p.ParseProgram()
+	if len(p.errors) > 0 {
+		t.Logf("errors: %v\n", p.errors)
+		return
+	}
+	t.Logf("STATEMENTS: %v\n", program.Stmts)
 }
