@@ -1,7 +1,9 @@
 package parser
 
 import (
+	"flame/ast"
 	"flame/scanner"
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -70,13 +72,22 @@ func TestParserParseBinOpExprStmt(t *testing.T) {
 }
 
 func TestParserParseIfStmt(t *testing.T) {
-	input := "if true { #string x = \"x\"} elseif false { } else { }\n"
+	input := `
+		if true {
+			#string x = "x"
+		} elseif false {
+
+		} else {  }
+	`
 	s := scanner.New(input)
 	p := New(s)
 	program := p.ParseProgram()
 	if len(p.errors) > 0 {
 		t.Logf("errors: %v\n", p.errors)
 		return
+	}
+	for _, v := range program.Stmts {
+		fmt.Println(v.(*ast.IfStmt).Default)
 	}
 	t.Logf("STATEMENTS: %v\n", program.Stmts)
 }

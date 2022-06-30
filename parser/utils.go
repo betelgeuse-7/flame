@@ -24,7 +24,7 @@ func checkPrimitiveValue(p *Parser, dt token.TokenType) bool {
 			return false
 		}
 	case token.T_BoolKw:
-		if p.cur.Lit != "true" && p.cur.Lit != "false" {
+		if p.cur.Typ != token.T_Bool {
 			p.reportErr("%d:%d invalid value for bool type: '%s'", p.cur.Pos.Y, p.cur.Pos.X, p.cur.Lit)
 			return false
 		}
