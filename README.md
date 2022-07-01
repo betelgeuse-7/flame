@@ -134,7 +134,7 @@ void->void helloWorld => {
     println("hello")
 }
 
-string x, bool y->[u32 z] X => {
+string x, bool y->[u32] X => {
     [42, 24, 66, 12, 3]
 }
 // alternative: omit curly braces and put the return value right after '=>'
