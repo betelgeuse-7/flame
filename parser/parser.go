@@ -58,6 +58,9 @@ func (p *Parser) parseStmt() ast.Stmt {
 		return p.parseConstDecl()
 	case token.T_If:
 		return p.parseIfStmt()
+	case token.T_Else, token.T_ElseIf:
+		p.reportErr("no 'elseif's, or 'else's without a preceding if")
+		return nil
 	default:
 		return p.parseExprStmt()
 	}
@@ -216,58 +219,57 @@ func (p *Parser) parseInfixExpr(left ast.Expr) ast.Expr {
 	return expr
 }
 
-// TODO Re-write if statement parsing method below vvv
+// ? *Parser.parseElseIfStmt
 
-/* // TODO how can i simplify, and make the code below, maintainable?
-// ? This is so ugly
 func (p *Parser) parseIfStmt() *ast.IfStmt {
 	stmt := &ast.IfStmt{}
 	p.advance()
 	stmt.Cond = p.parseExpr()
 	if stmt.Cond == nil {
-		p.reportErr("%d:%d No condition in if statement", p.cur.Pos.Y, p.cur.Pos.X)
+		p.reportErr("empty condition in if statement")
 		return nil
 	}
 	if ok := p.assertPeek(token.T_LCurly); !ok {
 		return nil
 	}
-	p.advance()
-	for p.cur.Typ != token.T_RCurly {
-		if p.cur.Typ == token.T_Eof {
-			break
-		}
-		if bodyStmt := p.parseStmt(); bodyStmt != nil {
-			stmt.Body = append(stmt.Body, bodyStmt)
-		}
+	for p.peek.Typ != token.T_RCurly {
 		p.advance()
+		if p.cur.Typ == token.T_Eof {
+			p.reportErr("unexpected EOF in if statement body")
+			return nil
+		}
+		if newStmt := p.parseStmt(); newStmt != nil {
+			stmt.Body = append(stmt.Body, newStmt)
+		}
 	}
-	if ok := p.assertCur(token.T_RCurly); !ok {
+	if ok := p.assertPeek(token.T_RCurly); !ok {
 		return nil
 	}
-	if p.cur.Typ == token.T_ElseIf {
+	switch p.peek.Typ {
+	case token.T_ElseIf:
+		p.advance()
 		stmt.Alternative = p.parseIfStmt()
-	}
-	fmt.Println("parseif: ", p.cur.Typ, p.cur.Lit)
-	if p.cur.Typ == token.T_Else {
-		elseBranch := []ast.Stmt{}
+	case token.T_Else:
+		p.advance()
+		elseBranchStmts := []ast.Stmt{}
 		if ok := p.assertPeek(token.T_LCurly); !ok {
 			return nil
 		}
-		for p.cur.Typ != token.T_RCurly {
-			if p.cur.Typ == token.T_Eof {
-				break
-			}
-			if elseBranchStmt := p.parseStmt(); elseBranchStmt != nil {
-				elseBranch = append(elseBranch, elseBranchStmt)
-			}
+		for p.peek.Typ != token.T_RCurly {
 			p.advance()
+			if p.cur.Typ == token.T_Eof {
+				p.reportErr("unexpected EOF in else statement body")
+				return nil
+			}
+			if newElseBranchStmt := p.parseStmt(); newElseBranchStmt != nil {
+				elseBranchStmts = append(elseBranchStmts, newElseBranchStmt)
+			}
 		}
-		if ok := p.assertCur(token.T_RCurly); !ok {
+		if ok := p.assertPeek(token.T_RCurly); !ok {
 			return nil
 		}
-		stmt.Default = elseBranch
+		stmt.Default = elseBranchStmts
 		p.advance()
 	}
 	return stmt
 }
-*/

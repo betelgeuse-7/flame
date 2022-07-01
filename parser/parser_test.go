@@ -1,9 +1,7 @@
 package parser
 
 import (
-	"flame/ast"
 	"flame/scanner"
-	"fmt"
 	"strings"
 	"testing"
 )
@@ -76,8 +74,12 @@ func TestParserParseIfStmt(t *testing.T) {
 		if true {
 			#string x = "x"
 		} elseif false {
-
-		} else {  }
+			#u32 y = 5
+		} elseif 2 + 2 {
+			#bool isGoodWeather = true
+		} else{ 
+				#f32 z = 14.5
+		}
 	`
 	s := scanner.New(input)
 	p := New(s)
@@ -86,8 +88,6 @@ func TestParserParseIfStmt(t *testing.T) {
 		t.Logf("errors: %v\n", p.errors)
 		return
 	}
-	for _, v := range program.Stmts {
-		fmt.Println(v.(*ast.IfStmt).Default)
-	}
 	t.Logf("STATEMENTS: %v\n", program.Stmts)
+
 }
