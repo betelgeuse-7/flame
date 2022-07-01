@@ -62,6 +62,7 @@ func TestParserParseBinOpExprStmt(t *testing.T) {
 	input += "5 -\n"
 	input += "2 << 1\n"
 	input += "-16.7 >> 1\n"
+	input += "#f32 n = foo"
 
 	s := scanner.New(input)
 	p := New(s)

@@ -66,6 +66,8 @@ func (p *Parser) parseStmt() ast.Stmt {
 	}
 }
 
+// TODO add support for using identifiers as expressions (values in var/const decls)
+
 func (p *Parser) parseVarDecl() *ast.VarDeclStmt {
 	s := &ast.VarDeclStmt{DataType: p.cur.Typ}
 	if ok := p.assertPeek(token.T_Ident); !ok {
