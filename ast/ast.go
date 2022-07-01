@@ -90,6 +90,8 @@ type PostfixOp struct {
 
 func (p PostfixOp) IsANumericValue() bool { return false }
 
+// ? Alternative : []*ElseIfStmt
+
 type IfStmt struct {
 	Cond        Expr
 	Body        []Stmt
@@ -110,11 +112,10 @@ func (i *IfStmt) String() string {
 		res += i.Alternative.String()
 	}
 	if len(i.Default) > 0 {
-		res += " else {\n\t"
+		res += "} else {\n\t"
 		for _, v := range i.Default {
 			res += v.String() + "\n"
 		}
 	}
-	res += "}"
 	return res
 }

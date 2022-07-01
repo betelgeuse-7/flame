@@ -76,9 +76,6 @@ func (p *Parser) parseVarDecl() *ast.VarDeclStmt {
 		return nil
 	}
 	p.advance()
-	if ok := checkPrimitiveValue(p, s.DataType); !ok {
-		return nil
-	}
 	s.Value = p.parseExpr()
 	return s
 }
@@ -99,9 +96,6 @@ func (p *Parser) parseConstDecl() *ast.ConstDeclStmt {
 		return nil
 	}
 	p.advance()
-	if ok := checkPrimitiveValue(p, s.Decl.DataType); !ok {
-		return nil
-	}
 	s.Decl.Value = p.parseExpr()
 	return s
 }

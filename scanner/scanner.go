@@ -2,6 +2,7 @@ package scanner
 
 import (
 	"flame/token"
+	"strings"
 )
 
 const _EOF_RUNE = rune(0)
@@ -75,6 +76,7 @@ func (s *Scanner) Next() token.Token {
 	doubleCharTok, ok := doubleCharMap[curAndAhead]
 	if ok {
 		s.doubleAdvance()
+		doubleCharTok.Pos = token.TokenPos{X: s.x, Y: s.y}
 		return doubleCharTok
 	}
 	singleCharTok, ok := singleCharMap[byte(s.ch)]
@@ -86,6 +88,7 @@ func (s *Scanner) Next() token.Token {
 	}
 	if ok {
 		s.advance()
+		singleCharTok.Pos = token.TokenPos{X: s.x, Y: s.y}
 		return singleCharTok
 	}
 	illegalCh := s.ch
@@ -132,7 +135,10 @@ func (s *Scanner) scanIdentOrKw() token.Token {
 		tok = token.Token{Typ: token.T_Ident, Lit: lit, Pos: token.TokenPos{X: s.x, Y: s.y}}
 	}
 	if tok.Typ != token.T_Ident {
-		tok.Lit = string(tok.Typ)
+		tok.Lit = strings.ToLower(string(tok.Typ))
+	}
+	if tok.Typ == token.T_Bool {
+		tok.Lit = lit
 	}
 	return tok
 }

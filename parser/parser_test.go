@@ -2,6 +2,7 @@ package parser
 
 import (
 	"flame/scanner"
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -31,6 +32,7 @@ func TestParserParseProgram(t *testing.T) {
 	t.Logf("SUCCESS! Statements: %s", program.Stmts)
 }
 
+/*
 func TestParserParseProgramErrors(t *testing.T) {
 	expectedErrCount := 6
 	input := "#string x = 56\n"
@@ -51,7 +53,7 @@ func TestParserParseProgramErrors(t *testing.T) {
 		t.Logf("Err#%d: %s\n", i, e)
 	}
 }
-
+*/
 func TestParserParseBinOpExprStmt(t *testing.T) {
 	input := "#int x = 5 + 3\n"
 	input += "u32 y = 55 + -16 * 558\n"
@@ -59,14 +61,19 @@ func TestParserParseBinOpExprStmt(t *testing.T) {
 	input += "4 != 6 \"a\" && \"b\" \n"
 	input += "5 -\n"
 	input += "2 << 1\n"
-	input += "-16.7 >> \n"
+	input += "-16.7 >> 1\n"
 
 	s := scanner.New(input)
 	p := New(s)
 	program := p.ParseProgram()
-	t.Logf("STATEMENTS: %s", program.String())
-	t.Logf("errors len: %d\n", len(p.errors))
-	t.Logf("Parser errors: %v", p.Errors())
+	for _, v := range program.Stmts {
+		fmt.Println("stmt >>>>", v)
+	}
+	/*
+		t.Logf("STATEMENTS: %s", program.Stmts)
+		t.Logf("errors len: %d\n", len(p.errors))
+		t.Logf("Parser errors: %v", p.Errors())
+	*/
 }
 
 func TestParserParseIfStmt(t *testing.T) {
