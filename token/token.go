@@ -51,46 +51,41 @@ const (
 	T_Import   TokenType = "IMPORT"
 
 	/* ****** OPERATORS *********/
-	T_Lparen        TokenType = "LPAREN"
-	T_Rparen        TokenType = "RPAREN"
-	T_LSquareParen  TokenType = "LSQUAREPAREN"
-	T_RSquareParen  TokenType = "RSQUAREPAREN"
-	T_LCurly        TokenType = "LCURLY"
-	T_RCurly        TokenType = "RCURLY"
-	T_Plus          TokenType = "PLUS"
-	T_PlusPlus      TokenType = "PLUSPLUS"
-	T_Minus         TokenType = "MINUS"
-	T_MinusMinus    TokenType = "MINUSMINUS"
-	T_Mul           TokenType = "MUL"
-	T_Div           TokenType = "DIV"
-	T_Modulus       TokenType = "MODULUS"
-	T_Eq            TokenType = "EQ"
-	T_PlusEq        TokenType = "PLUSEQ"
-	T_MinusEq       TokenType = "MINUSEQ"
-	T_MulEq         TokenType = "MULEQ"
-	T_DivEq         TokenType = "DIVEQ"
-	T_NotEq         TokenType = "NOTEQ"
-	T_DoubleEq      TokenType = "DOUBLEEQ"
-	T_BitLeftShift  TokenType = "BITLEFTSHIFT"  // <<
-	T_BitRightShift TokenType = "BITRIGHTSHIFT" // >>
-	T_Ampersand     TokenType = "AMPERSAND"     // &
-	T_BitOr         TokenType = "BITOR"         // |
-	T_BitXor        TokenType = "BITXOR"        // ^
-	T_And           TokenType = "AND"
-	T_Or            TokenType = "OR"
-	T_Dot           TokenType = "DOT"
-	T_Gt            TokenType = "GT"
-	T_Lt            TokenType = "LT"
-	T_GtEq          TokenType = "GTEQ" // >=
-	T_LtEq          TokenType = "LTEQ" // <=
-	T_Dollar        TokenType = "DOLLAR"
-	T_Colon         TokenType = "COLON"
-	T_SingleQuote   TokenType = "SINGLE_QUOTE"
-	T_Comma         TokenType = "COMMA"
-	T_Exclamation   TokenType = "EXCLAMATION"
-	T_SingleArrow   TokenType = "SINGLEARROW" // ->
-	T_DoubleArrow   TokenType = "DOUBLEARROW" // =>
-	T_Octothorp     TokenType = "OCTOTHORP"   // #
+	T_Lparen       TokenType = "LPAREN"
+	T_Rparen       TokenType = "RPAREN"
+	T_LSquareParen TokenType = "LSQUAREPAREN"
+	T_RSquareParen TokenType = "RSQUAREPAREN"
+	T_LCurly       TokenType = "LCURLY"
+	T_RCurly       TokenType = "RCURLY"
+	T_Plus         TokenType = "PLUS"
+	T_PlusPlus     TokenType = "PLUSPLUS"
+	T_Minus        TokenType = "MINUS"
+	T_MinusMinus   TokenType = "MINUSMINUS"
+	T_Mul          TokenType = "MUL"
+	T_Div          TokenType = "DIV"
+	T_Modulus      TokenType = "MODULUS"
+	T_Eq           TokenType = "EQ"
+	T_PlusEq       TokenType = "PLUSEQ"
+	T_MinusEq      TokenType = "MINUSEQ"
+	T_MulEq        TokenType = "MULEQ"
+	T_DivEq        TokenType = "DIVEQ"
+	T_NotEq        TokenType = "NOTEQ"
+	T_DoubleEq     TokenType = "DOUBLEEQ"
+	T_And          TokenType = "AND"
+	T_Or           TokenType = "OR"
+	T_Dot          TokenType = "DOT"
+	T_Gt           TokenType = "GT"
+	T_Lt           TokenType = "LT"
+	T_GtEq         TokenType = "GTEQ" // >=
+	T_LtEq         TokenType = "LTEQ" // <=
+	T_Dollar       TokenType = "DOLLAR"
+	T_Colon        TokenType = "COLON"
+	T_SingleQuote  TokenType = "SINGLE_QUOTE"
+	T_Comma        TokenType = "COMMA"
+	T_Exclamation  TokenType = "EXCLAMATION"
+	T_SingleArrow  TokenType = "SINGLEARROW" // ->
+	T_DoubleArrow  TokenType = "DOUBLEARROW" // =>
+	T_Octothorp    TokenType = "OCTOTHORP"   // #
 
 	/* ****** Built-ins *********/
 	T_PrintlnFn TokenType = "PRINTLNFN"

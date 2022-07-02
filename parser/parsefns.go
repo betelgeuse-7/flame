@@ -23,8 +23,6 @@ func (p *Parser) registerAllExprParseFns() {
 	p.registerInfixFn(token.T_DoubleEq, p.parseInfixExpr)
 	p.registerInfixFn(token.T_And, p.parseInfixExpr)
 	p.registerInfixFn(token.T_Or, p.parseInfixExpr)
-	p.registerInfixFn(token.T_BitLeftShift, p.parseInfixExpr)
-	p.registerInfixFn(token.T_BitRightShift, p.parseInfixExpr)
 	//p.registerInfixFn(token.T_SingleQuote, p.parseInfixExpr)
 }
 

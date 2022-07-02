@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+// TODO string interpolation
+
 const _EOF_RUNE = rune(0)
 
 type Scanner struct {

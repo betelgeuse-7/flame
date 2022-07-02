@@ -55,13 +55,8 @@ There are three types of operators:
 < > <= >=       // ...
 !=              // not equal
 ==              // comparison
-<<              // left shift operator (bitwise)
->>              // right shift operator 
 &&              // logical and
 ||              // logical or
-&               // bitwise and
-|               // bitwise or 
-^               // bitwise xor
 '               // indexing operator
 
 // postfix
@@ -71,7 +66,7 @@ There are three types of operators:
 
 ### Context-Free Grammar (Extended Backus-Naur Form)
 
-TODO
+[GRAMMAR](GRAMMAR.md)
 
 #### Variable declaration
 ```
@@ -98,17 +93,17 @@ float f32
 fruits'0 // indexing
 fruits'-1 // last element
 
-#string popped = pop(fruits)
+#string popped = pop(fruits) // or fruits.pop()
 popped // Banana
-append(fruits, "Strawberry")
+append(fruits, "Strawberry") // or fruits.append("Strawberry")
 ```
 - Maps
 ```rust
 #{string:u32} people = {"Jennifer": 44}
-people."Mehmet" = 77
-u32 jenniferAge = people'"Jennifer" 
-jenniferAge // 44
-delete(people, "Mehmet")
+people."Mehmet" = 77                    // or people.set("Mehmet", 77)
+u32 jenniferAge = people'"Jennifer"     // or people.get("Jennifer")
+jenniferAge // 44  
+delete(people, "Mehmet")                // or people.delete("Mehmet")
 ```
 - structs
 ```rust
@@ -125,10 +120,8 @@ a.x // "Hello"
 #[A] AX = [a, a, a]
 AX'1 // a
 ```
-- Pointers
-TODO
-
 #### Functions
+// TODO think about the syntax
 ```rust
 void->void helloWorld => {
     println("hello")
@@ -190,8 +183,3 @@ match {
         // ...
 }
 ```
-
-#### Methods
-
-TODO
-

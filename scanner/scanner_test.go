@@ -15,43 +15,39 @@ var (
 	_f64          = func(lit string) token.Token { return token.Token{Typ: token.T_Float64, Lit: lit} }
 	_u64          = func(lit string) token.Token { return token.Token{Typ: token.T_Uint, Lit: lit} }
 	_uintKw       = token.Token{Typ: token.T_UintKw, Lit: "uint"}
-	_println      = token.Token{Typ: token.T_PrintlnFn, Lit: "PRINTLNFN"}
+	_println      = token.Token{Typ: token.T_PrintlnFn, Lit: "printlnfn"}
 	_lparen       = token.Token{Typ: token.T_Lparen, Lit: "("}
 	_rparen       = token.Token{Typ: token.T_Rparen, Lit: ")"}
 	_plus         = token.Token{Typ: token.T_Plus, Lit: "+"}
 	_minus        = token.Token{Typ: token.T_Minus, Lit: "-"}
 	_mul          = token.Token{Typ: token.T_Mul, Lit: "*"}
 	_div          = token.Token{Typ: token.T_Div, Lit: "/"}
-	_eof          = token.Token{Typ: token.T_Eof, Lit: "EOF"}
-	_if           = token.Token{Typ: token.T_If, Lit: "IF"}
+	_eof          = token.Token{Typ: token.T_Eof, Lit: "eof"}
+	_if           = token.Token{Typ: token.T_If, Lit: "if"}
 	_lcurly       = token.Token{Typ: token.T_LCurly, Lit: "{"}
 	_rcurly       = token.Token{Typ: token.T_RCurly, Lit: "}"}
-	_forever      = token.Token{Typ: token.T_Forever, Lit: "FOREVER"}
-	_foreach      = token.Token{Typ: token.T_Foreach, Lit: "FOREACH"}
-	_in           = token.Token{Typ: token.T_In, Lit: "IN"}
-	_true         = token.Token{Typ: token.T_True, Lit: "true"}
+	_forever      = token.Token{Typ: token.T_Forever, Lit: "forever"}
+	_foreach      = token.Token{Typ: token.T_Foreach, Lit: "foreach"}
+	_in           = token.Token{Typ: token.T_In, Lit: "in"}
+	_bool         = func(lit string) token.Token { return token.Token{Typ: token.T_Bool, Lit: lit} }
 	_comma        = token.Token{Typ: token.T_Comma, Lit: ","}
-	_match        = token.Token{Typ: token.T_Match, Lit: "MATCH"}
-	_with         = token.Token{Typ: token.T_With, Lit: "WITH"}
+	_match        = token.Token{Typ: token.T_Match, Lit: "match"}
+	_with         = token.Token{Typ: token.T_With, Lit: "with"}
 	_single_arrow = token.Token{Typ: token.T_SingleArrow, Lit: "->"}
 	_double_arrow = token.Token{Typ: token.T_DoubleArrow, Lit: "=>"}
 	_dollar       = token.Token{Typ: token.T_Dollar, Lit: "$"}
-	_lshift       = token.Token{Typ: token.T_BitLeftShift, Lit: "<<"}
 	_neq          = token.Token{Typ: token.T_NotEq, Lit: "!="}
 	_eqeq         = token.Token{Typ: token.T_DoubleEq, Lit: "=="}
 	_geq          = token.Token{Typ: token.T_GtEq, Lit: ">="}
 	_minusminus   = token.Token{Typ: token.T_MinusMinus, Lit: "--"}
 	_plusplus     = token.Token{Typ: token.T_PlusPlus, Lit: "++"}
-	_ampersand    = token.Token{Typ: token.T_Ampersand, Lit: "&"}
-	_bitor        = token.Token{Typ: token.T_BitOr, Lit: "|"}
 	_and          = token.Token{Typ: token.T_And, Lit: "&&"}
 	_or           = token.Token{Typ: token.T_Or, Lit: "||"}
-	_bitxor       = token.Token{Typ: token.T_BitXor, Lit: "^"}
 	_pluseq       = token.Token{Typ: token.T_PlusEq, Lit: "+="}
 	_muleq        = token.Token{Typ: token.T_MulEq, Lit: "*="}
-	_pub          = token.Token{Typ: token.T_Pub, Lit: "PUB"}
-	_struct       = token.Token{Typ: token.T_Struct, Lit: "STRUCT"}
-	_embeds       = token.Token{Typ: token.T_Embeds, Lit: "EMBEDS"}
+	_pub          = token.Token{Typ: token.T_Pub, Lit: "pub"}
+	_struct       = token.Token{Typ: token.T_Struct, Lit: "struct"}
+	_embeds       = token.Token{Typ: token.T_Embeds, Lit: "embeds"}
 	_dot          = token.Token{Typ: token.T_Dot, Lit: "."}
 	_comment      = func(lit string) token.Token { return token.Token{Typ: token.T_Comment, Lit: lit} }
 	_illegal      = func(lit string) token.Token { return token.Token{Typ: token.T_Illegal, Lit: lit} }
@@ -69,7 +65,7 @@ func TestScannerNext(t *testing.T) {
 	input += "61 + 75 (12 *3) /  86 - 144"
 	input += "if{}forever foreach _, item in "
 	input += "true, 10.5 match with -> =>"
-	input += "$ << != == >=- -- ++ & && | || ^ += *="
+	input += "$ != == >=- -- ++ && || += *="
 	input += "// this is a comment\n"
 	input += "pub struct embeds ."
 	input += "\"🙂\" #string 🩸 = \"blood\""
@@ -95,10 +91,10 @@ func TestScannerNext(t *testing.T) {
 		_u64("75"), _lparen, _u64("12"), _mul, _u64("3"), _rparen,
 		_div, _u64("86"), _minus, _u64("144"), _if, _lcurly, _rcurly,
 		_forever, _foreach, _ident("_"), _comma, _ident("item"), _in,
-		_true, _comma, _f64("10.5"), _match, _with, _single_arrow,
-		_double_arrow, _dollar, _lshift, _neq, _eqeq, _geq,
-		_minus, _minusminus, _plusplus, _ampersand, _and, _bitor,
-		_or, _bitxor, _pluseq, _muleq, _comment(" this is a comment"), _pub, _struct, _embeds, _dot,
+		_bool("true"), _comma, _f64("10.5"), _match, _with, _single_arrow,
+		_double_arrow, _dollar, _neq, _eqeq, _geq,
+		_minus, _minusminus, _plusplus, _and,
+		_or, _pluseq, _muleq, _comment(" this is a comment"), _pub, _struct, _embeds, _dot,
 		_string("🙂"), _octothorp, _stringkw, _illegal("🩸"), _eq, _string("blood"),
 		_ident("people"), _single_quote, _u64("1"), _u64("5"), _modulus, _u64("3"), _f64("-178.6"), _i64("-168"),
 	}
