@@ -1,7 +1,7 @@
 package scanner
 
 func isWhitespace(ch rune) bool {
-	return ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t'
+	return ch == ' ' || ch == '\r' || ch == '\t'
 }
 
 func isAsciiLetter(ch rune) bool {

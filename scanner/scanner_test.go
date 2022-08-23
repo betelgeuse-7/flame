@@ -46,6 +46,7 @@ var (
 	_illegal      = func(lit string) token.Token { return token.Token{Typ: token.Illegal, Lit: lit} }
 	_single_quote = token.Token{Typ: token.SingleQuote, Lit: "'"}
 	_modulus      = token.Token{Typ: token.Modulus, Lit: "%"}
+	_newline      = token.Token{Typ: token.Newline, Lit: "\\n"}
 )
 
 func TestScannerNext(t *testing.T) {
@@ -79,21 +80,23 @@ func TestScannerNext(t *testing.T) {
 		got = append(got, tok)
 	}
 	want := []token.Token{
-		_stringkw, _ident("name"), _eq, _string("Jennifer"), _octothorp, _uintKw, _ident("age"), _eq,
-		_u64("44"), _println, _lparen, _string("hello"), _rparen, _u64("61"), _plus,
-		_u64("75"), _lparen, _u64("12"), _mul, _u64("3"), _rparen,
+		_stringkw, _ident("name"), _eq, _string("Jennifer"), _newline,
+		_octothorp, _uintKw, _ident("age"), _eq, _u64("44"), _newline,
+		_println, _lparen, _string("hello"), _rparen, _newline, _u64("61"),
+		_plus, _u64("75"), _lparen, _u64("12"), _mul, _u64("3"), _rparen,
 		_div, _u64("86"), _minus, _u64("144"), _if, _lcurly, _rcurly,
-		_forever, _ident("_"), _comma, _ident("item"),
-		_bool("true"), _comma, _f64("10.5"), _single_arrow,
-		_double_arrow, _dollar, _neq, _eqeq, _geq,
-		_minus, _minusminus, _plusplus, _and,
-		_or, _pluseq, _muleq, _comment(" this is a comment"), _dot,
-		_string("🙂"), _octothorp, _stringkw, _illegal("🩸"), _eq, _string("blood"),
-		_ident("people"), _single_quote, _u64("1"), _u64("5"), _modulus, _u64("3"), _f64("-178.6"), _i64("-168"),
+		_forever, _ident("_"), _comma, _ident("item"), _bool("true"),
+		_comma, _f64("10.5"), _single_arrow, _double_arrow, _dollar,
+		_neq, _eqeq, _geq, _minus, _minusminus, _plusplus, _and, _or,
+		_pluseq, _muleq, _comment(" this is a comment"), _newline, _dot, _string("🙂"),
+		_octothorp, _stringkw, _illegal("🩸"), _eq, _string("blood"),
+		_ident("people"), _single_quote, _u64("1"), _u64("5"), _modulus,
+		_u64("3"), _f64("-178.6"), _i64("-168"),
 	}
 	for i, v := range got {
 		if i == len(want) {
 			t.Errorf("out of bounds %d\n", i)
+			break
 		}
 		curWant := want[i]
 		if v.Lit != curWant.Lit || v.Typ != curWant.Typ {
@@ -104,5 +107,27 @@ func TestScannerNext(t *testing.T) {
 	expectSDotY = 5
 	if s.y != expectSDotY {
 		t.Errorf("expected s.y to be %d, but got %d\n", expectSDotY, s.y)
+	}
+}
+
+func TestNewline(t *testing.T) {
+	input := "hello\nhe"
+	want := []token.Token{
+		{Typ: token.Ident},
+		{Typ: token.Newline},
+		{Typ: token.Ident},
+		{Typ: token.Eof},
+	}
+	l := New(input)
+	i := 0
+	for {
+		if i == len(want) {
+			break
+		}
+		tok := l.Next()
+		if tok.Typ != want[i].Typ {
+			t.Errorf("error (index#%d): wanted: %+v, got: %+v\n", i, want[i], tok)
+		}
+		i++
 	}
 }

@@ -21,6 +21,7 @@ var singleCharMap = map[byte]token.Token{
 	'\'': {Typ: token.SingleQuote, Lit: "'"},
 	'%':  {Typ: token.Modulus, Lit: "%"},
 	'#':  {Typ: token.Octothorp, Lit: "#"},
+	'\n': {Typ: token.Newline, Lit: "\\n"},
 }
 
 var doubleCharMap = map[string]token.Token{
