@@ -1,46 +1,5 @@
-### Flame Compiler to Go
-
-This is the Flame language:
-
-Semantics of the language: [SEMANTICS](SEMANTICS.md)
-
-#### Encoding
-The Flame compiler supports UTF-8 encoded files, but you can only use ASCII when declaring variables.
-The supported line termination sequence is ASCII LF (\n). (CRLF (\r\n) is not seen as a newline, only \n).
-
-#### Indentation, and whitespace
-The Flame language is whitespace-insensitive, meaning whitespace is not important. 
-
-#### Comments
-Comments start with ```//```. Multi-line comments are not supported yet.
-
-#### Identifiers
-Identifiers are one or more characters of ASCII letters, or ```_```. ({A..Z, a..z, _})
-Identifiers are case-sensitive (e.g ```firstname```, and ```firstName``` is not the same variable.).
-Keywords cannot be used as identifiers.
-
-#### Keywords 
-TODO
-
-#### String literals
-String literals are enclosed in ```"``` (double quote) pairs. You can interpolate strings using ```${}``` notation. (e.g Assume world variable stores "WORLD" value. "Hello ${world}" == "Hello WORLD")
-
-Escape sequences are not yet supported. (TODO)
-
-#### Numeric literals
-There are three types of numerals: 
-    - Signed integers (```int```, ```int32```),
-    - Unsigned integers (```uint```, ```uint32```), and
-    - Floating point numbers (```float64```, ```float32```)
-
-Octal (```0o```), hexadecimal (```0x```), and binary notations (```0b```) are not yet supported.
-
-#### Operators
-There are three types of operators:
-    - Prefix,
-    - Infix, and
-    - Postfix
-```
+### Operators
+```c
 // prefix
 -               // negation operator
 --              // decrement-by-one
@@ -63,123 +22,121 @@ There are three types of operators:
 --              // decrement-by-one
 ++              // increment-by-one
 ```
-
-### Context-Free Grammar (Extended Backus-Naur Form)
-
-[GRAMMAR](GRAMMAR.md)
-
-#### Variable declaration
+### Variable declaration
 ```
-string name = "Jennifer"
-uint age = 44
+<type> <varname> = <expr>
 ```
-#### Constant declaration
+### Constant declaration
+```
+#<type> <varname> = <expr>
+```
+### Primitive types
+
+Integers (64-bit): 
 ```go
-#string name = "Jennifer"
-#uint age = 44
+int
+uint
 ```
-#### Types
-```rust
-void
+Real numbers (64-bit)
+```c
+float
+```
+```go
 string
 bool
-int i32
-uint u32
-float f32
-```
-- Slices
-```rust
-#[string] fruits = ["Kiwi", "Orange", "Apple", "Banana"]
-fruits'0 // indexing
-fruits'-1 // last element
-
-#string popped = pop(fruits) // or fruits.pop()
-popped // Banana
-append(fruits, "Strawberry") // or fruits.append("Strawberry")
-```
-- Maps
-```rust
-#{string:u32} people = {"Jennifer": 44}
-people."Mehmet" = 77                    // or people.set("Mehmet", 77)
-u32 jenniferAge = people'"Jennifer"     // or people.get("Jennifer")
-jenniferAge // 44  
-delete(people, "Mehmet")                // or people.delete("Mehmet")
-```
-- structs
-```rust
-pub struct A {
-    pub string x
-    pub struct B {
-        u32 y
-    }
-}
-
-#A a = A.new(x: "Hello", B: B.new(y: 45))
-a.x // "Hello"
-
-#[A] AX = [a, a, a]
-AX'1 // a
-```
-#### Functions
-// TODO think about the syntax
-```rust
-void->void helloWorld => {
-    println("hello")
-}
-
-string x, bool y->[u32] X => {
-    [42, 24, 66, 12, 3]
-}
-// alternative: omit curly braces and put the return value right after '=>'
-// string x, bool y->[u32 z] X => [42, 24, 66, 12, 3]
-// you can also add return if you want
-// string x, bool y->[u32 z] X => {
-//    return [42, 24, 66, 12, 3]
-//}
-```
-##### Calling functions
-```rust
-helloWorld()
-#uint32 z = X("yay", true)
-println(z) //[42, 24, 66, 12, 3]
+char
 ```
 
-#### Control flow
+### Compound types
+Slices:
+```js
+// Initialization
+[int] nx = []
+[string] names = ["A", "B", "C"]
+// constant slice
+#[string] y = ["y", "yy", "yyy"]
+
+// Indexing
+#string firstElementOfY = y'0
+
+// Appending
+names = push(names, "D")
+
+// Deleting
+names = delete(names, 1) // delete item with index 1
+names = delete(names, -1) // -1 is the last index
+```
+
+Maps:
+```js
+// Initialization
+{string:string} = {}
+{string:uint} people = {"Jennifer": 44, "Mike": 26}
+#{string:bool} x = {"t": false, "y": true}
+
+// Get value with key
+people'"Jennifer // 44
+
+// Delete value with key
+people = delete(people, "Jennifer")
+
+// Update a field
+people."Mike" = 77
+```
+
+### Control flow
+If:
 ```go
 if true {
-    // ...
+
+} elseif false {
+
 } else {
-    // ...
+
 }
-
-if a == 5 {
-    // ...
-} elseif {} else {}
-
+```
+Loops:
+```go
 // incremented variable is i, repeat 6 times. equivalent to: for(int i = 0; i < 6; i++) {//...} in C
 repeat 6, i {
-    println(i)
-}
+    println(i) 
+} // 0, 1, 2, 3, 4, 5
+
 // infinite loop
 forever {
 
 }
 
-foreach index, item in <sequence> {
-    // do sth with item
-}
-
-foreach _, item in <sequence> {}
-
+// while loop
 while a > 10 {}
 
 break, continue
+```
 
-match {
-    with <val>:
-        // ...
-    ...
-    else:
-        // ...
+### Functions
+```rust
+// Declaration
+phunc <func-name>: <newline>
+[<args>]: <newline>
+[<return-values>] {
+    
+}
+```
+```c
+phunc greet:
+[string name]:
+[string] {
+    return "Hello " + name
+}
+
+phunc add:
+[int n, int n2]:
+[int] {
+    return n + n2
+}
+
+phunc helloWorld:
+{
+    println("Hello world")
 }
 ```
