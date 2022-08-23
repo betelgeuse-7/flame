@@ -36,7 +36,7 @@ func (p *Parser) Errors() []string {
 
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
-	for p.cur.Typ != token.T_Eof {
+	for p.cur.Typ != token.Eof {
 		stmt := p.parseStmt()
 		if stmt != nil {
 			program.Stmts = append(program.Stmts, stmt)
@@ -50,15 +50,15 @@ func (p *Parser) parseStmt() ast.Stmt {
 	if isDataTypeKw(p.cur.Typ) {
 		return p.parseVarDecl()
 	}
-	if p.cur.Typ == token.T_Eof {
+	if p.cur.Typ == token.Eof {
 		return nil
 	}
 	switch p.cur.Typ {
-	case token.T_Octothorp:
+	case token.Octothorp:
 		return p.parseConstDecl()
-	case token.T_If:
+	case token.If:
 		return p.parseIfStmt()
-	case token.T_Else, token.T_ElseIf:
+	case token.Else, token.ElseIf:
 		p.reportErr("no 'elseif's, or 'else's without a preceding if")
 		return nil
 	default:
@@ -66,15 +66,17 @@ func (p *Parser) parseStmt() ast.Stmt {
 	}
 }
 
-// TODO add support for using identifiers as expressions (values in var/const decls)
+// TODO var && const decl parsing
+// types can also be slices, maps, ...
+// value can be another variable/const, or a function call, or a slice/map literal, etc.
 
 func (p *Parser) parseVarDecl() *ast.VarDeclStmt {
 	s := &ast.VarDeclStmt{DataType: p.cur.Typ}
-	if ok := p.assertPeek(token.T_Ident); !ok {
+	if ok := p.assertPeek(token.Ident); !ok {
 		return nil
 	}
 	s.Name = p.cur.Lit
-	if ok := p.assertPeek(token.T_Eq); !ok {
+	if ok := p.assertPeek(token.Eq); !ok {
 		return nil
 	}
 	p.advance()
@@ -90,11 +92,11 @@ func (p *Parser) parseConstDecl() *ast.ConstDeclStmt {
 	}
 	p.advance()
 	s.Decl.DataType = p.cur.Typ
-	if ok := p.assertPeek(token.T_Ident); !ok {
+	if ok := p.assertPeek(token.Ident); !ok {
 		return nil
 	}
 	s.Decl.Name = p.cur.Lit
-	if ok := p.assertPeek(token.T_Eq); !ok {
+	if ok := p.assertPeek(token.Eq); !ok {
 		return nil
 	}
 	p.advance()
@@ -112,15 +114,15 @@ func (p *Parser) parseExpr() ast.Expr {
 	// TODO error handling
 	var leftExpr ast.Expr
 	switch p.cur.Typ {
-	case token.T_Uint, token.T_Uint32:
+	case token.Uint:
 		leftExpr = p.parseUnsignedIntegerLiteral()
-	case token.T_Int, token.T_Int32:
+	case token.Int:
 		leftExpr = p.parseSignedIntegerLiteral()
-	case token.T_Float32, token.T_Float64:
+	case token.Float:
 		leftExpr = p.parseFloatLiteral()
-	case token.T_Bool:
+	case token.Bool:
 		leftExpr = p.parseBoolLiteral()
-	case token.T_String:
+	case token.String:
 		leftExpr = p.parseStringLiteral()
 	}
 	// is this an infix expr, or a prefix expr ?
@@ -138,57 +140,27 @@ func (p *Parser) parseStringLiteral() *ast.StringLiteral {
 }
 
 func (p *Parser) parseSignedIntegerLiteral() ast.SignedIntegerLiteral {
-	switch p.cur.Typ {
-	case token.T_Int:
-		val, err := strconv.ParseInt(p.cur.Lit, 10, 64)
-		if err != nil {
-			return nil
-		}
-		return &ast.IntLiteral{ValStr: p.cur.Lit, Val: val}
-	case token.T_Int32:
-		val, err := strconv.ParseInt(p.cur.Lit, 10, 32)
-		if err != nil {
-			return nil
-		}
-		return &ast.I32Literal{ValStr: p.cur.Lit, Val: int32(val)}
+	val, err := strconv.ParseInt(p.cur.Lit, 10, 64)
+	if err != nil {
+		return nil
 	}
-	return nil
+	return &ast.IntLiteral{ValStr: p.cur.Lit, Val: val}
 }
 
 func (p *Parser) parseUnsignedIntegerLiteral() ast.UnsignedIntegerLiteral {
-	switch p.cur.Typ {
-	case token.T_Uint:
-		val, err := strconv.ParseUint(p.cur.Lit, 10, 64)
-		if err != nil {
-			return nil
-		}
-		return &ast.UintLiteral{ValStr: p.cur.Lit, Val: val}
-	case token.T_Uint32:
-		val, err := strconv.ParseUint(p.cur.Lit, 10, 32)
-		if err != nil {
-			return nil
-		}
-		return &ast.U32Literal{ValStr: p.cur.Lit, Val: uint32(val)}
+	val, err := strconv.ParseUint(p.cur.Lit, 10, 64)
+	if err != nil {
+		return nil
 	}
-	return nil
+	return &ast.UintLiteral{ValStr: p.cur.Lit, Val: val}
 }
 
 func (p *Parser) parseFloatLiteral() ast.IFloatLiteral {
-	switch p.cur.Typ {
-	case token.T_Float64:
-		val, err := strconv.ParseFloat(p.cur.Lit, 64)
-		if err != nil {
-			return nil
-		}
-		return &ast.FloatLiteral{ValStr: p.cur.Lit, Val: val}
-	case token.T_Float32:
-		val, err := strconv.ParseFloat(p.cur.Lit, 32)
-		if err != nil {
-			return nil
-		}
-		return &ast.F32Literal{ValStr: p.cur.Lit, Val: float32(val)}
+	val, err := strconv.ParseFloat(p.cur.Lit, 64)
+	if err != nil {
+		return nil
 	}
-	return nil
+	return &ast.FloatLiteral{ValStr: p.cur.Lit, Val: val}
 }
 
 func (p *Parser) parseBoolLiteral() *ast.BooleanLiteral {
@@ -215,8 +187,6 @@ func (p *Parser) parseInfixExpr(left ast.Expr) ast.Expr {
 	return expr
 }
 
-// ? *Parser.parseElseIfStmt
-
 func (p *Parser) parseIfStmt() *ast.IfStmt {
 	stmt := &ast.IfStmt{}
 	p.advance()
@@ -225,12 +195,12 @@ func (p *Parser) parseIfStmt() *ast.IfStmt {
 		p.reportErr("empty condition in if statement")
 		return nil
 	}
-	if ok := p.assertPeek(token.T_LCurly); !ok {
+	if ok := p.assertPeek(token.LCurly); !ok {
 		return nil
 	}
-	for p.peek.Typ != token.T_RCurly {
+	for p.peek.Typ != token.RCurly {
 		p.advance()
-		if p.cur.Typ == token.T_Eof {
+		if p.cur.Typ == token.Eof {
 			p.reportErr("unexpected EOF in if statement body")
 			return nil
 		}
@@ -238,22 +208,22 @@ func (p *Parser) parseIfStmt() *ast.IfStmt {
 			stmt.Body = append(stmt.Body, newStmt)
 		}
 	}
-	if ok := p.assertPeek(token.T_RCurly); !ok {
+	if ok := p.assertPeek(token.RCurly); !ok {
 		return nil
 	}
 	switch p.peek.Typ {
-	case token.T_ElseIf:
+	case token.ElseIf:
 		p.advance()
 		stmt.Alternative = p.parseIfStmt()
-	case token.T_Else:
+	case token.Else:
 		p.advance()
 		elseBranchStmts := []ast.Stmt{}
-		if ok := p.assertPeek(token.T_LCurly); !ok {
+		if ok := p.assertPeek(token.LCurly); !ok {
 			return nil
 		}
-		for p.peek.Typ != token.T_RCurly {
+		for p.peek.Typ != token.RCurly {
 			p.advance()
-			if p.cur.Typ == token.T_Eof {
+			if p.cur.Typ == token.Eof {
 				p.reportErr("unexpected EOF in else statement body")
 				return nil
 			}
@@ -261,7 +231,7 @@ func (p *Parser) parseIfStmt() *ast.IfStmt {
 				elseBranchStmts = append(elseBranchStmts, newElseBranchStmt)
 			}
 		}
-		if ok := p.assertPeek(token.T_RCurly); !ok {
+		if ok := p.assertPeek(token.RCurly); !ok {
 			return nil
 		}
 		stmt.Default = elseBranchStmts

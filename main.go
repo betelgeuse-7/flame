@@ -38,14 +38,4 @@ func main() {
 		}
 	}
 	fmt.Println(program.Stmts)
-	/*
-		declarations := gogen.Compile(program)
-		goCode := "package main\n\nfunc main() {\n"
-		goCode += declarations
-		goCode += "}"
-		if err := os.WriteFile(fileName+"_compiled.go.example", []byte(goCode), 0777); err != nil {
-			log.Fatalln("error while writing to file: ", err.Error())
-		}
-		log.Println("Compiled Flame to Go :)")
-	*/
 }

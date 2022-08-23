@@ -140,3 +140,8 @@ phunc helloWorld:
     println("Hello world")
 }
 ```
+```c
+// Calling
+#string greeted = greet("Abidin")
+println(greeted) // Hello Abidin 
+```
