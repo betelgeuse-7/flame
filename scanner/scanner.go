@@ -57,7 +57,7 @@ func (s *Scanner) peek() rune {
 
 func (s *Scanner) Next() token.Token {
 	if s.ch == _EOF_RUNE {
-		return token.Token{Typ: token.T_Eof, Lit: "EOF", Pos: token.TokenPos{X: s.x, Y: s.y}}
+		return token.Token{Typ: token.Eof, Lit: "EOF", Pos: token.TokenPos{X: s.x, Y: s.y}}
 	}
 	if isWhitespace(s.ch) {
 		s.eatWs()
@@ -83,7 +83,7 @@ func (s *Scanner) Next() token.Token {
 	}
 	singleCharTok, ok := singleCharMap[byte(s.ch)]
 	// is it a number starting with a minus? (e.g -5)
-	if singleCharTok.Typ == token.T_Minus {
+	if singleCharTok.Typ == token.Minus {
 		if peek := s.peek(); isDigit(peek) {
 			return s.scanNumber()
 		}
@@ -95,7 +95,7 @@ func (s *Scanner) Next() token.Token {
 	}
 	illegalCh := s.ch
 	s.advance()
-	return token.Token{Typ: token.T_Illegal, Lit: string(illegalCh), Pos: token.TokenPos{X: s.x, Y: s.y}}
+	return token.Token{Typ: token.Illegal, Lit: string(illegalCh), Pos: token.TokenPos{X: s.x, Y: s.y}}
 }
 
 func (s *Scanner) scanNumber() token.Token {
@@ -116,11 +116,11 @@ func (s *Scanner) scanNumber() token.Token {
 	lit := string(s.input[start:s.pos])
 	tok := token.Token{Lit: lit, Pos: token.TokenPos{X: s.x, Y: s.y}}
 	if dots > 0 {
-		tok.Typ = token.T_Float64
+		tok.Typ = token.Float
 	} else if startsWithMinus {
-		tok.Typ = token.T_Int
+		tok.Typ = token.Int
 	} else {
-		tok.Typ = token.T_Uint
+		tok.Typ = token.Uint
 	}
 	return tok
 }
@@ -134,12 +134,12 @@ func (s *Scanner) scanIdentOrKw() token.Token {
 	tok := token.Token{}
 	tok, ok := keywordMap[lit]
 	if !ok {
-		tok = token.Token{Typ: token.T_Ident, Lit: lit, Pos: token.TokenPos{X: s.x, Y: s.y}}
+		tok = token.Token{Typ: token.Ident, Lit: lit, Pos: token.TokenPos{X: s.x, Y: s.y}}
 	}
-	if tok.Typ != token.T_Ident {
+	if tok.Typ != token.Ident {
 		tok.Lit = strings.ToLower(string(tok.Typ))
 	}
-	if tok.Typ == token.T_Bool {
+	if tok.Typ == token.Bool {
 		tok.Lit = lit
 	}
 	return tok
@@ -155,7 +155,7 @@ func (s *Scanner) scanString() token.Token {
 	lit := string(s.input[start:s.pos])
 	// skip over the terminating quote
 	s.advance()
-	return token.Token{Typ: token.T_String, Lit: lit, Pos: token.TokenPos{X: s.x, Y: s.y}}
+	return token.Token{Typ: token.String, Lit: lit, Pos: token.TokenPos{X: s.x, Y: s.y}}
 }
 
 func (s *Scanner) scanComment() token.Token {
@@ -166,7 +166,7 @@ func (s *Scanner) scanComment() token.Token {
 		s.advance()
 	}
 	lit := string(s.input[start:s.pos])
-	return token.Token{Typ: token.T_Comment, Lit: lit, Pos: token.TokenPos{X: s.x, Y: s.y}}
+	return token.Token{Typ: token.Comment, Lit: lit, Pos: token.TokenPos{X: s.x, Y: s.y}}
 }
 
 func (s *Scanner) eatWs() {
