@@ -10,27 +10,20 @@ func (p *Parser) advance() {
 	p.peek = p.scanner.Next()
 }
 
-func (p *Parser) assertCur(tt token.TokenType) bool {
-	if p.cur.Typ == tt {
-		p.advance()
-		return true
-	}
-	p.reportErr(fmt.Sprintf("wanted '%s', got (%s, %s)", tt, p.cur.Typ, p.cur.Lit))
-	return false
-}
-
-func (p *Parser) assertPeek(tt token.TokenType) bool {
-	if p.peek.Typ == tt {
-		p.advance()
-		return true
-	}
-	p.reportErr(fmt.Sprintf("expected '%s', got (%s, %s)", tt, p.peek.Typ, p.peek.Lit))
-	return false
-}
-
 func (p *Parser) reportErr(format string, args ...interface{}) {
 	err_ := fmt.Sprintf(format, args...)
 	lineNos := fmt.Sprintf("%d:%d ", p.cur.Pos.Y, p.cur.Pos.X)
 	err_ = lineNos + err_
 	p.errors = append(p.errors, err_)
+}
+
+// expect next (peek) token to be tok
+// call p.advance if not disappointed :P
+func (p *Parser) expect(tok token.TokenType) bool {
+	if p.peek.Typ != tok {
+		p.reportErr("expected next token to be %s, got %s instead", tok, p.peek.Typ)
+		return false
+	}
+	p.advance()
+	return true
 }
