@@ -19,6 +19,23 @@ func _stmtPrint(stmts []ast.Stmt) {
 	}
 }
 
+func TestParserParseBinOpExprStmt(t *testing.T) {
+	input := "#int x = 5 + 3\n"
+	input += "u32 y = 55 + -16 * 558\n"
+	input += "5 +\n"
+	input += "4 != 6 \"a\" && \"b\" \n"
+	input += "5 -\n"
+	input += "2 + 1\n"
+	input += "-16.7 - 1\n"
+	input += "#f32 n = foo"
+
+	s := scanner.New(input)
+	p := New(s)
+	program := p.ParseProgram()
+	_errPrint(p.errors)
+	_stmtPrint(program.Stmts)
+}
+
 func TestParserParseGenDeclStmt(t *testing.T) {
 	input := `
 		string x = "hey"
@@ -42,19 +59,14 @@ func TestParserParseGenDeclStmt(t *testing.T) {
 	_stmtPrint(parsed.Stmts)
 }
 
-func TestParserParseBinOpExprStmt(t *testing.T) {
-	input := "#int x = 5 + 3\n"
-	input += "u32 y = 55 + -16 * 558\n"
-	input += "5 +\n"
-	input += "4 != 6 \"a\" && \"b\" \n"
-	input += "5 -\n"
-	input += "2 + 1\n"
-	input += "-16.7 - 1\n"
-	input += "#f32 n = foo"
-
+// test var/const decls with compound types
+func TestParserParseGenDeclStmt2(t *testing.T) {
+	input := `
+		#[string] nx = ["hey", "hello"]
+	`
 	s := scanner.New(input)
 	p := New(s)
-	program := p.ParseProgram()
+	parsed := p.ParseProgram()
 	_errPrint(p.errors)
-	_stmtPrint(program.Stmts)
+	_stmtPrint(parsed.Stmts)
 }

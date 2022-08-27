@@ -20,8 +20,28 @@ func (p *Parser) reportErr(format string, args ...interface{}) {
 // expect next (peek) token to be tok
 // call p.advance if not disappointed :P
 func (p *Parser) expect(tok token.TokenType) bool {
+	msg := "expected next token to be %s, got %s instead"
+	illegalMsg := "expected next token to be %s, got %s ('%s') instead"
 	if p.peek.Typ != tok {
-		p.reportErr("expected next token to be %s, got %s instead", tok, p.peek.Typ)
+		if p.peek.Typ == token.Illegal {
+			p.reportErr(illegalMsg, tok, p.peek.Typ, p.peek.Lit)
+		} else {
+			p.reportErr(msg, tok, p.peek.Typ)
+		}
+		return false
+	}
+	p.advance()
+	return true
+}
+
+func (p *Parser) expectType(isConst bool) bool {
+	msg := "expected a type"
+	if isConst {
+		msg += " after '#'"
+	}
+	peek := p.peek.Typ
+	if peek == token.Illegal || peek == token.Newline || peek == token.Eof {
+		p.reportErr(msg)
 		return false
 	}
 	p.advance()

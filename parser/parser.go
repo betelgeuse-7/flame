@@ -49,9 +49,17 @@ func (p *Parser) parseStmt() ast.Stmt {
 	}
 	switch p.cur.Typ {
 	case token.BoolKw, token.FloatKw, token.StringKw, token.IntKw, token.UintKw:
-		return p.parseVarDeclStmt()
+		return p.parseVarDeclStmt(false, false)
 	case token.Octothorp:
-		return p.parseConstDeclStmt()
+		// if next token is a [, or a {; then it must be a compound type
+		next := p.peek.Typ
+		if next == token.LSquareParen || next == token.LCurly {
+			// starting token = #
+			return p.parseCompoundConstDecl()
+		}
+		return p.parseConstDeclStmt(false, false)
+	case token.LSquareParen, token.LCurly:
+		return p.parseCompoundVarDecl()
 	}
 	if p.shouldCallParseExprStmt() {
 		return p.parseExprStmt()
@@ -63,17 +71,52 @@ func (p *Parser) parseStmt() ast.Stmt {
 	return nil
 }
 
-func (p *Parser) parseConstDeclStmt() ast.Stmt {
-	// expect a type after #
-	illegal, newline, eof := token.Illegal, token.Newline, token.Eof
-	p.advance()
-	curTyp := p.cur.Typ
-	if curTyp == illegal || curTyp == newline || curTyp == eof {
-		p.reportErr("expected a type after '#'")
-		return nil
+// TODO: parse map, and slice literals
+
+func (p *Parser) parseConstDeclStmt(isSlice, isMap bool) ast.Stmt {
+	if isSlice && isMap {
+		panic("parseConstDeclStmt: isMap, and isSlice are both true")
 	}
 	tok := p.cur.Typ
 	tokPos := p.cur.Pos
+	p.advance()
+	// expect a type after #
+	var dataType ast.Type
+	if isSlice {
+		p.advance()
+		dataType = p.decideDataType(p.cur.Lit)
+		dataType = ast.SliceType{
+			Typ: dataType,
+		}
+		if ok := p.expect(token.RSquareParen); !(ok) {
+			return nil
+		}
+	} else if isMap {
+		p.advance()
+		keyType := p.decideDataType(p.cur.Lit)
+		if ok := p.expect(token.Colon); !(ok) {
+			return nil
+		}
+		peekTyp := p.peek.Typ
+		if peekTyp == token.Eof || peekTyp == token.Illegal || peekTyp == token.Newline {
+			p.reportErr("expected another type for value in map type declaration")
+			return nil
+		}
+		p.advance()
+		valType := p.decideDataType(p.cur.Lit)
+		dataType = ast.MapType{
+			Key:   keyType,
+			Value: valType,
+		}
+		if ok := p.expect(token.RCurly); !(ok) {
+			return nil
+		}
+	} else {
+		if ok := p.expectType(true); !(ok) {
+			return nil
+		}
+		dataType = p.decideDataType(p.cur.Lit)
+	}
 	if ok := p.expect(token.Ident); !(ok) {
 		return nil
 	}
@@ -82,7 +125,7 @@ func (p *Parser) parseConstDeclStmt() ast.Stmt {
 		return nil
 	}
 	p.advance()
-	if p.cur.Typ == eof {
+	if p.cur.Typ == token.Eof {
 		p.reportErr("unexpected EOF")
 		return nil
 	}
@@ -92,6 +135,7 @@ func (p *Parser) parseConstDeclStmt() ast.Stmt {
 		return nil
 	}
 	stmt := &ast.ConstDeclStmt{}
+	stmt.Type = dataType
 	stmt.Ident = ident.(ast.Ident)
 	stmt.Tok = tok
 	stmt.TokPos = tokPos
@@ -99,7 +143,7 @@ func (p *Parser) parseConstDeclStmt() ast.Stmt {
 	return stmt
 }
 
-func (p *Parser) parseVarDeclStmt() ast.Stmt {
+func (p *Parser) parseVarDeclStmt(isSlice, isMap bool) ast.Stmt {
 	tok := p.cur.Typ
 	tokPos := p.cur.Pos
 	if ok := p.expect(token.Ident); !(ok) {
@@ -127,6 +171,16 @@ func (p *Parser) parseVarDeclStmt() ast.Stmt {
 	return stmt
 }
 
+func (p *Parser) parseCompoundConstDecl() ast.Stmt {
+	isSlice, isMap := p.peek.Typ == token.LSquareParen, p.peek.Typ == token.LCurly
+	return p.parseConstDeclStmt(isSlice, isMap)
+}
+
+func (p *Parser) parseCompoundVarDecl() ast.Stmt {
+	isSlice, isMap := p.peek.Typ == token.LSquareParen, p.peek.Typ == token.LCurly
+	return p.parseVarDeclStmt(isSlice, isMap)
+}
+
 func (p *Parser) shouldCallParseExprStmt() bool {
 	cur := p.cur.Typ
 	in := func(tt []token.TokenType, t token.TokenType) bool {
@@ -140,7 +194,28 @@ func (p *Parser) shouldCallParseExprStmt() bool {
 	toks := []token.TokenType{
 		token.Plus, token.Minus, token.Div, token.Mul, token.Lt, token.LtEq, token.Modulus,
 		token.Gt, token.GtEq, token.NotEq, token.DoubleEq, token.And, token.Or, token.Uint,
-		token.Int, token.Float, token.Bool, token.String,
+		token.Int, token.Float, token.Bool, token.String, token.Char,
 	}
 	return in(toks, cur)
+}
+
+func (p *Parser) decideDataType(lit string) ast.Type {
+	/*
+		? when extending this method, we will need to support user-defined types.
+		? those will probably be called ast.StructType.
+		=============================
+		> for user-defined types, the key will probably be "IDENT", or "ident".
+		> I am not sure.
+	*/
+	m := map[string]ast.Type{
+		"string": ast.StringType{},
+		"uint":   ast.UintType{},
+		"int":    ast.IntType{},
+		"float":  ast.FloatType{},
+		"bool":   ast.BoolType{},
+		"char":   ast.CharType{},
+	}
+	val := m[lit]
+	// nil if non-existent
+	return val
 }
