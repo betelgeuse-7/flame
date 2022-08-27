@@ -1,10 +1,23 @@
 package parser
 
 import (
+	"flame/ast"
 	"flame/scanner"
 	"fmt"
 	"testing"
 )
+
+func _errPrint(errs []string) {
+	for _, v := range errs {
+		fmt.Printf("[!!!] > %s\n", v)
+	}
+}
+
+func _stmtPrint(stmts []ast.Stmt) {
+	for _, v := range stmts {
+		fmt.Printf(">>> %+v\n", v)
+	}
+}
 
 func TestParserParseGenDeclStmt(t *testing.T) {
 	input := `
@@ -16,21 +29,17 @@ func TestParserParseGenDeclStmt(t *testing.T) {
 		bool isRaining = false
 		int n2 = n
 		.
+		int
+		int x 
+		int x = 
+		#string
 	`
 	s := scanner.New(input)
 	p := New(s)
 	parsed := p.ParseProgram()
-	fmt.Println(len(parsed.Stmts))
-	fmt.Println(parsed.Stmts)
 	errs := p.errors
-	if len(errs) > 0 {
-		fmt.Println("errors: ", errs)
-		return
-	}
-	/*
-		for _, v := range parsed.Stmts {
-			fmt.Printf(">>> %s\n", v.String())
-		}*/
+	_errPrint(errs)
+	_stmtPrint(parsed.Stmts)
 }
 
 func TestParserParseBinOpExprStmt(t *testing.T) {
@@ -46,12 +55,6 @@ func TestParserParseBinOpExprStmt(t *testing.T) {
 	s := scanner.New(input)
 	p := New(s)
 	program := p.ParseProgram()
-	for _, v := range program.Stmts {
-		fmt.Println("stmt >>>>", v)
-	}
-	/*
-		t.Logf("STATEMENTS: %s", program.Stmts)
-		t.Logf("errors len: %d\n", len(p.errors))
-		t.Logf("Parser errors: %v", p.Errors())
-	*/
+	_errPrint(p.errors)
+	_stmtPrint(program.Stmts)
 }

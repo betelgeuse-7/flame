@@ -4,8 +4,6 @@ import (
 	"flame/ast"
 	"flame/scanner"
 	"flame/token"
-	"fmt"
-	"reflect"
 )
 
 type Parser struct {
@@ -37,7 +35,6 @@ func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	for p.peek.Typ != token.Eof {
 		stmt := p.parseStmt()
-		fmt.Println("ParseProgram: reflect: ", reflect.TypeOf(stmt))
 		if stmt != nil {
 			program.Stmts = append(program.Stmts, stmt)
 		}
@@ -47,31 +44,36 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 func (p *Parser) parseStmt() ast.Stmt {
-	if p.cur.Typ == token.Eof {
-		return nil
-	}
 	for p.cur.Typ == token.Newline {
 		p.advance()
 	}
 	switch p.cur.Typ {
-	case token.BoolKw, token.FloatKw, token.StringKw, token.IntKw, token.UintKw, token.Octothorp:
-		return p.parseGenDeclStmt()
+	case token.BoolKw, token.FloatKw, token.StringKw, token.IntKw, token.UintKw:
+		return p.parseVarDeclStmt()
+	case token.Octothorp:
+		return p.parseConstDeclStmt()
 	}
 	if p.shouldCallParseExprStmt() {
 		return p.parseExprStmt()
+	}
+	if p.cur.Typ == token.Eof {
+		return nil
 	}
 	p.reportErr("unexpected token: %s", p.cur.Lit)
 	return nil
 }
 
-func (p *Parser) parseGenDeclStmt() ast.Stmt {
-	isConst := p.cur.Typ == token.Octothorp
-	if isConst {
-		p.advance()
+func (p *Parser) parseConstDeclStmt() ast.Stmt {
+	// expect a type after #
+	illegal, newline, eof := token.Illegal, token.Newline, token.Eof
+	p.advance()
+	curTyp := p.cur.Typ
+	if curTyp == illegal || curTyp == newline || curTyp == eof {
+		p.reportErr("expected a type after '#'")
+		return nil
 	}
 	tok := p.cur.Typ
 	tokPos := p.cur.Pos
-	// parse identifier
 	if ok := p.expect(token.Ident); !(ok) {
 		return nil
 	}
@@ -79,26 +81,50 @@ func (p *Parser) parseGenDeclStmt() ast.Stmt {
 	if ok := p.expect(token.Eq); !(ok) {
 		return nil
 	}
-	if p.peek.Typ == token.Eof {
+	p.advance()
+	if p.cur.Typ == eof {
 		p.reportErr("unexpected EOF")
 		return nil
 	}
-	p.advance()
 	value := p.parseExpr()
-	genDeclStmt := ast.GenericDeclStmt{
-		TokPos: tokPos,
-		Tok:    tok,
-		Ident:  ident.(ast.Ident),
-		Value:  value,
+	if value == nil {
+		p.reportErr("missing expression in constant declaration")
+		return nil
 	}
-	if isConst {
-		return ast.ConstDeclStmt{
-			GenericDeclStmt: genDeclStmt,
-		}
+	stmt := &ast.ConstDeclStmt{}
+	stmt.Ident = ident.(ast.Ident)
+	stmt.Tok = tok
+	stmt.TokPos = tokPos
+	stmt.Value = value
+	return stmt
+}
+
+func (p *Parser) parseVarDeclStmt() ast.Stmt {
+	tok := p.cur.Typ
+	tokPos := p.cur.Pos
+	if ok := p.expect(token.Ident); !(ok) {
+		return nil
 	}
-	return ast.VarDeclStmt{
-		GenericDeclStmt: genDeclStmt,
+	ident := p.parseIdent()
+	if ok := p.expect(token.Eq); !(ok) {
+		return nil
 	}
+	p.advance()
+	if p.cur.Typ == token.Eof {
+		p.reportErr("unexpected EOF")
+		return nil
+	}
+	value := p.parseExpr()
+	if value == nil {
+		p.reportErr("missing expression in variable declaration")
+		return nil
+	}
+	stmt := &ast.VarDeclStmt{}
+	stmt.Ident = ident.(ast.Ident)
+	stmt.Tok = tok
+	stmt.TokPos = tokPos
+	stmt.Value = value
+	return stmt
 }
 
 func (p *Parser) shouldCallParseExprStmt() bool {
