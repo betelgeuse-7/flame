@@ -1,10 +1,6 @@
 package ast
 
-import (
-	"flame/token"
-	"testing"
-)
-
+/*
 func TestIfStmtString(t *testing.T) {
 	stmt := &IfStmt{Cond: ExprStmt{Expr: &BooleanLiteral{ValStr: "true", Val: true}},
 		Body: []Stmt{&VarDeclStmt{DataType: token.IntKw, Name: "x", Value: &IntLiteral{ValStr: "5", Val: 5}}},
@@ -15,3 +11,4 @@ func TestIfStmtString(t *testing.T) {
 	s := stmt.String()
 	t.Logf("%s\n", s)
 }
+*/

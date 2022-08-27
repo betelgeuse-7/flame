@@ -4,6 +4,7 @@ import "flame/token"
 
 var keywordMap = map[string]token.Token{
 	"string":   {Typ: token.StringKw},
+	"char":     {Typ: token.CharKw},
 	"uint":     {Typ: token.UintKw},
 	"int":      {Typ: token.IntKw},
 	"float":    {Typ: token.FloatKw},

@@ -9,6 +9,7 @@ const (
 
 	Ident   TokenType = "IDENT"
 	String  TokenType = "STRING"
+	Char    TokenType = "CHAR"
 	Uint    TokenType = "UINT"
 	Int     TokenType = "INT"
 	Float   TokenType = "FLOAT"
@@ -17,6 +18,7 @@ const (
 
 	/* ****** KEYWORDS *********/
 	StringKw TokenType = "string"
+	CharKw   TokenType = "char"
 	UintKw   TokenType = "uint"
 	IntKw    TokenType = "int"
 	FloatKw  TokenType = "float"
@@ -33,6 +35,7 @@ const (
 	While    TokenType = "WHILE"
 	Break    TokenType = "BREAK"
 	Continue TokenType = "CONTINUE"
+	Phunc    TokenType = "PHUNC"
 
 	/* ****** OPERATORS *********/
 	Lparen       TokenType = "LPAREN"
@@ -81,11 +84,11 @@ const (
 type Token struct {
 	Typ TokenType
 	Lit string
-	Pos TokenPos
+	Pos Pos
 }
 
 // X -> column
 // Y -> line
-type TokenPos struct {
+type Pos struct {
 	X, Y int
 }

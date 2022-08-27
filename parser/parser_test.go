@@ -70,3 +70,25 @@ func TestParserParseGenDeclStmt2(t *testing.T) {
 	_errPrint(p.errors)
 	_stmtPrint(parsed.Stmts)
 }
+
+func TestParserParseGenDeclStmt3(t *testing.T) {
+	input := `
+		#[string] nx = ["hey", ]
+	`
+	s := scanner.New(input)
+	p := New(s)
+	parsed := p.ParseProgram()
+	_errPrint(p.errors)
+	_stmtPrint(parsed.Stmts)
+}
+
+func TestParserParseGenDeclStmt4(t *testing.T) {
+	input := `
+		#[string] nx = ["hey" "hello"]
+	`
+	s := scanner.New(input)
+	p := New(s)
+	parsed := p.ParseProgram()
+	_errPrint(p.errors)
+	_stmtPrint(parsed.Stmts)
+}

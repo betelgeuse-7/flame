@@ -15,6 +15,8 @@ var singleCharMap = map[byte]token.Token{
 	')':  {Typ: token.Rparen, Lit: ")"},
 	'{':  {Typ: token.LCurly, Lit: "{"},
 	'}':  {Typ: token.RCurly, Lit: "}"},
+	'[':  {Typ: token.LSquareParen, Lit: "["},
+	']':  {Typ: token.RSquareParen, Lit: "]"},
 	',':  {Typ: token.Comma, Lit: ","},
 	'.':  {Typ: token.Dot, Lit: "."},
 	'$':  {Typ: token.Dollar, Lit: "$"},

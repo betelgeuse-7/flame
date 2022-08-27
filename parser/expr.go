@@ -30,6 +30,12 @@ func (p *Parser) parseExpr() ast.Expr {
 	case token.Ident:
 		// parse ident
 		leftExpr = p.parseIdent()
+	case token.LSquareParen:
+		// parse slice
+		leftExpr = p.parseSliceLiteral()
+	case token.LCurly:
+		// parse map
+		leftExpr = p.parseMapLiteral()
 	}
 	// is this an infix expr, or a prefix expr ?
 	infixFn := p.infixParseFns[p.peek.Typ]
@@ -87,7 +93,7 @@ func (p *Parser) parseInfixExpr(left ast.Expr) ast.Expr {
 	if expr.Rhs == nil {
 		x := p.cur.Pos.X
 		y := p.cur.Pos.Y
-		p.reportErr("%d:%d Expected another expression after '%s', but got nothing", y, x, expr.Operator)
+		p.err("%d:%d Expected another expression after '%s', but got nothing", y, x, expr.Operator)
 		return nil
 	}
 	return expr
@@ -95,4 +101,47 @@ func (p *Parser) parseInfixExpr(left ast.Expr) ast.Expr {
 
 func (p *Parser) parseIdent() ast.Expr {
 	return ast.Ident{Pos: p.cur.Pos, Ident: p.cur.Lit}
+}
+
+func (p *Parser) parseSliceLiteral() ast.Expr {
+	lit := ast.SliceType{}
+	p.advance()
+	for {
+		switch p.cur.Typ {
+		case token.Eof:
+			p.err("unexpected EOF")
+			return nil
+		case token.Newline:
+			p.err("unexpected newline")
+			return nil
+		case token.Illegal:
+			p.err("illegal character: '%s'", p.cur.Lit)
+			return nil
+		case token.RSquareParen:
+			return lit
+		}
+		elem := p.parseExpr()
+		lit.Elems = append(lit.Elems, elem)
+		// missing comma
+		if p.peek.Typ != token.Comma {
+			p.err("missing comma (',')")
+			return nil
+		}
+		p.advance()
+		// after comma, if next token is either:
+		// 		token.RSquareParen,
+		//		token.Newline,
+		//		token.Eof, or
+		//		token.Illegal;
+		// raise error.
+		if p.cur.Typ == token.RSquareParen || p.cur.Typ == token.Newline ||
+			p.cur.Typ == token.Eof || p.cur.Typ == token.Illegal {
+			p.err("redundant comma")
+			return nil
+		}
+	}
+}
+
+func (p *Parser) parseMapLiteral() ast.Expr {
+	return nil
 }

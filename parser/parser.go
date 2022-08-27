@@ -4,6 +4,7 @@ import (
 	"flame/ast"
 	"flame/scanner"
 	"flame/token"
+	"fmt"
 )
 
 type Parser struct {
@@ -67,7 +68,7 @@ func (p *Parser) parseStmt() ast.Stmt {
 	if p.cur.Typ == token.Eof {
 		return nil
 	}
-	p.reportErr("unexpected token: %s", p.cur.Lit)
+	p.err("unexpected token: %s", p.cur.Lit)
 	return nil
 }
 
@@ -84,6 +85,7 @@ func (p *Parser) parseConstDeclStmt(isSlice, isMap bool) ast.Stmt {
 	var dataType ast.Type
 	if isSlice {
 		p.advance()
+		dataTypeLit := p.cur.Lit
 		dataType = p.decideDataType(p.cur.Lit)
 		dataType = ast.SliceType{
 			Typ: dataType,
@@ -91,18 +93,22 @@ func (p *Parser) parseConstDeclStmt(isSlice, isMap bool) ast.Stmt {
 		if ok := p.expect(token.RSquareParen); !(ok) {
 			return nil
 		}
+		// pseudo?
+		tok = token.TokenType(fmt.Sprintf("[%s]", dataTypeLit))
 	} else if isMap {
 		p.advance()
+		keyTypeLit := p.cur.Lit
 		keyType := p.decideDataType(p.cur.Lit)
 		if ok := p.expect(token.Colon); !(ok) {
 			return nil
 		}
 		peekTyp := p.peek.Typ
 		if peekTyp == token.Eof || peekTyp == token.Illegal || peekTyp == token.Newline {
-			p.reportErr("expected another type for value in map type declaration")
+			p.err("expected another type for value in map type declaration")
 			return nil
 		}
 		p.advance()
+		valTypeLit := p.cur.Lit
 		valType := p.decideDataType(p.cur.Lit)
 		dataType = ast.MapType{
 			Key:   keyType,
@@ -111,6 +117,7 @@ func (p *Parser) parseConstDeclStmt(isSlice, isMap bool) ast.Stmt {
 		if ok := p.expect(token.RCurly); !(ok) {
 			return nil
 		}
+		tok = token.TokenType(fmt.Sprintf("{%s:%s}", keyTypeLit, valTypeLit))
 	} else {
 		if ok := p.expectType(true); !(ok) {
 			return nil
@@ -126,12 +133,12 @@ func (p *Parser) parseConstDeclStmt(isSlice, isMap bool) ast.Stmt {
 	}
 	p.advance()
 	if p.cur.Typ == token.Eof {
-		p.reportErr("unexpected EOF")
+		p.err("unexpected EOF")
 		return nil
 	}
 	value := p.parseExpr()
 	if value == nil {
-		p.reportErr("missing expression in constant declaration")
+		p.err("missing expression in constant declaration")
 		return nil
 	}
 	stmt := &ast.ConstDeclStmt{}
@@ -155,12 +162,12 @@ func (p *Parser) parseVarDeclStmt(isSlice, isMap bool) ast.Stmt {
 	}
 	p.advance()
 	if p.cur.Typ == token.Eof {
-		p.reportErr("unexpected EOF")
+		p.err("unexpected EOF")
 		return nil
 	}
 	value := p.parseExpr()
 	if value == nil {
-		p.reportErr("missing expression in variable declaration")
+		p.err("missing expression in variable declaration")
 		return nil
 	}
 	stmt := &ast.VarDeclStmt{}

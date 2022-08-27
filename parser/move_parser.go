@@ -10,7 +10,7 @@ func (p *Parser) advance() {
 	p.peek = p.scanner.Next()
 }
 
-func (p *Parser) reportErr(format string, args ...interface{}) {
+func (p *Parser) err(format string, args ...interface{}) {
 	err_ := fmt.Sprintf(format, args...)
 	lineNos := fmt.Sprintf("%d:%d ", p.cur.Pos.Y, p.cur.Pos.X)
 	err_ = lineNos + err_
@@ -24,9 +24,9 @@ func (p *Parser) expect(tok token.TokenType) bool {
 	illegalMsg := "expected next token to be %s, got %s ('%s') instead"
 	if p.peek.Typ != tok {
 		if p.peek.Typ == token.Illegal {
-			p.reportErr(illegalMsg, tok, p.peek.Typ, p.peek.Lit)
+			p.err(illegalMsg, tok, p.peek.Typ, p.peek.Lit)
 		} else {
-			p.reportErr(msg, tok, p.peek.Typ)
+			p.err(msg, tok, p.peek.Typ)
 		}
 		return false
 	}
@@ -41,7 +41,7 @@ func (p *Parser) expectType(isConst bool) bool {
 	}
 	peek := p.peek.Typ
 	if peek == token.Illegal || peek == token.Newline || peek == token.Eof {
-		p.reportErr(msg)
+		p.err(msg)
 		return false
 	}
 	p.advance()
