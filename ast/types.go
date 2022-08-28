@@ -56,9 +56,23 @@ func (s SliceType) String() string {
 }
 
 type MapType struct {
-	Key, Value Type
-	Elems      []MapType
+	KeyType, ValueType Type
+	Key, Value         Expr
+	Elems              []MapType
 }
 
 func (MapType) typ() {}
 func (MapType) E()   {}
+func (m MapType) String() string {
+	b := strings.Builder{}
+	if m.Key == nil && m.Value == nil {
+		b.WriteString("{}")
+		return b.String()
+	}
+	b.WriteString(fmt.Sprintf("{%s:%s", m.Key, m.Value))
+	for _, v := range m.Elems {
+		b.WriteString(fmt.Sprintf(", %s:%s", v.Key, v.Value))
+	}
+	b.WriteString("}")
+	return b.String()
+}

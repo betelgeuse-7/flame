@@ -78,9 +78,9 @@ func (p *Parser) parseConstDeclStmt(isSlice, isMap bool) ast.Stmt {
 	if isSlice && isMap {
 		panic("parseConstDeclStmt: isMap, and isSlice are both true")
 	}
+	p.advance()
 	tok := p.cur.Typ
 	tokPos := p.cur.Pos
-	p.advance()
 	// expect a type after #
 	var dataType ast.Type
 	if isSlice {
@@ -111,8 +111,8 @@ func (p *Parser) parseConstDeclStmt(isSlice, isMap bool) ast.Stmt {
 		valTypeLit := p.cur.Lit
 		valType := p.decideDataType(p.cur.Lit)
 		dataType = ast.MapType{
-			Key:   keyType,
-			Value: valType,
+			KeyType:   keyType,
+			ValueType: valType,
 		}
 		if ok := p.expect(token.RCurly); !(ok) {
 			return nil

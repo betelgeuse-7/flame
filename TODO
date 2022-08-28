@@ -1,5 +1,4 @@
 
-parser/parser.go
-	TODO Fix line numbers in parser errors.
-	TODO add support for using identifiers as expressions (values in var/const decls)
-	TODO error handling
+parser/expr.go
+	TODO missing comma
+	TODO redundant comma

@@ -62,7 +62,7 @@ func TestParserParseGenDeclStmt(t *testing.T) {
 // test var/const decls with compound types
 func TestParserParseGenDeclStmt2(t *testing.T) {
 	input := `
-		#[string] nx = ["hey", "hello"]
+		#[string] nx = ["hey", "hello", "ya", "j"]
 	`
 	s := scanner.New(input)
 	p := New(s)
@@ -91,4 +91,51 @@ func TestParserParseGenDeclStmt4(t *testing.T) {
 	parsed := p.ParseProgram()
 	_errPrint(p.errors)
 	_stmtPrint(parsed.Stmts)
+}
+
+func TestParserParseGenDeclStmt5(t *testing.T) {
+	input := `
+		#[string] a = ["ye", "s", "!"]
+		#[float] fx = [3.14, 5.17, 5.1]
+	`
+	s := scanner.New(input)
+	p := New(s)
+	parsed := p.ParseProgram()
+	_errPrint(p.errors)
+	_stmtPrint(parsed.Stmts)
+}
+
+func TestParserParseGenDeclStmt6(t *testing.T) {
+	input := `
+		#[string] a = ["a" "b" "c""d" "e" "f"]
+		#[string] b = ["a","b","c","d","e","f"]
+		#[string]c=["a","b","c",,,,,,,,,,,"d","e","f",,,,]
+`
+	s := scanner.New(input)
+	p := New(s)
+	parsed := p.ParseProgram()
+	_errPrint(p.errors)
+	_stmtPrint(parsed.Stmts)
+}
+
+func TestParserParseGenDeclStmt7(t *testing.T) {
+	input := `
+		#[string] a = ["a","b","c","d","e","f"]
+`
+	s := scanner.New(input)
+	p := New(s)
+	parsed := p.ParseProgram()
+	_errPrint(p.errors)
+	_stmtPrint(parsed.Stmts)
+}
+
+func TestParserParseMapLit(t *testing.T) {
+	input := `
+		#{string:string} px = {"name": "Jennifer", "age": "67"}
+	`
+	s := scanner.New(input)
+	p := New(s)
+	program := p.ParseProgram()
+	_errPrint(p.errors)
+	_stmtPrint(program.Stmts)
 }

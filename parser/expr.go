@@ -14,7 +14,6 @@ func (p *Parser) parseExprStmt() *ast.ExprStmt {
 }
 
 func (p *Parser) parseExpr() ast.Expr {
-	fmt.Println("parseExpr: ", p.cur.Typ)
 	var leftExpr ast.Expr
 	switch p.cur.Typ {
 	case token.Uint:
@@ -103,10 +102,11 @@ func (p *Parser) parseIdent() ast.Expr {
 	return ast.Ident{Pos: p.cur.Pos, Ident: p.cur.Lit}
 }
 
+// TODO comma check
 func (p *Parser) parseSliceLiteral() ast.Expr {
 	lit := ast.SliceType{}
 	p.advance()
-	for {
+	for p.cur.Typ != token.RSquareParen {
 		switch p.cur.Typ {
 		case token.Eof:
 			p.err("unexpected EOF")
@@ -115,33 +115,44 @@ func (p *Parser) parseSliceLiteral() ast.Expr {
 			p.err("unexpected newline")
 			return nil
 		case token.Illegal:
-			p.err("illegal character: '%s'", p.cur.Lit)
+			p.err("illegal character in slice literal: '%s'", p.cur.Lit)
 			return nil
-		case token.RSquareParen:
-			return lit
 		}
 		elem := p.parseExpr()
-		lit.Elems = append(lit.Elems, elem)
-		// missing comma
-		if p.peek.Typ != token.Comma {
-			p.err("missing comma (',')")
-			return nil
+		if elem != nil {
+			lit.Elems = append(lit.Elems, elem)
 		}
 		p.advance()
-		// after comma, if next token is either:
-		// 		token.RSquareParen,
-		//		token.Newline,
-		//		token.Eof, or
-		//		token.Illegal;
-		// raise error.
-		if p.cur.Typ == token.RSquareParen || p.cur.Typ == token.Newline ||
-			p.cur.Typ == token.Eof || p.cur.Typ == token.Illegal {
-			p.err("redundant comma")
-			return nil
-		}
 	}
+	return lit
 }
 
 func (p *Parser) parseMapLiteral() ast.Expr {
-	return nil
+	lit := ast.MapType{}
+	p.advance()
+	for p.cur.Typ != token.RCurly {
+		switch p.cur.Typ {
+		case token.Eof:
+			p.err("unexpected EOF")
+			return nil
+		case token.Newline:
+			p.advance()
+		case token.Illegal:
+			p.err("illegal character in map literal: '%s'", p.cur.Lit)
+			return nil
+		}
+		fmt.Println(p.cur.Typ, p.cur.Lit)
+		keyElem := p.parseExpr()
+		fmt.Println("keyElem: ", keyElem)
+		p.advance()
+		fmt.Println("p.cur: ", p.cur)
+		valElem := p.parseExpr()
+		fmt.Println("valElem: ", valElem)
+		if keyElem != nil && valElem != nil {
+			lit.Elems = append(lit.Elems, ast.MapType{Key: keyElem, Value: valElem})
+		}
+		p.advance()
+	}
+	fmt.Printf("lit: %+v\n", lit.Elems)
+	return lit
 }
